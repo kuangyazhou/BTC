@@ -12,6 +12,8 @@ const Product = () => import('@/components/product/index');
 const Receive = () => import('@/components/receive/index');
 const StateMent = () => import('@/components/statement/index');
 
+const notFound = () => import('@/components/404/index');
+
 Vue.use(Router)
 
 export default new Router({
@@ -72,7 +74,9 @@ export default new Router({
           name: 'StateMent',
           component: StateMent
         },
+        { path: '*', component: notFound }
       ]
-    }
+    },
+    { path: '*', component: notFound }
   ]
 })

@@ -2,11 +2,13 @@
   <div style="height:100%;">
     <BHeader></BHeader>
     <el-row :gutter="10" class="body">
-      <el-col :span="3" style="height:100%;">
+      <el-col :span="3" style="height:100%;padding-right:0px">
         <SideBar @routerChange="routerChange"></SideBar>
       </el-col>
       <el-col :span="21" class="content" style=" padding-right: 0px;">
-        <router-view></router-view>
+        <transition name="el-fade-in">
+          <router-view></router-view>
+        </transition>
       </el-col>
     </el-row>
     <BFooter></BFooter>
@@ -56,9 +58,11 @@ export default {
 <style scoped lang="less">
 .content {
   padding-top: 1em;
+  height: 100%;
+  // background: #efefef;
 }
 .body {
-  height: calc(100% - 60px);
+  height: calc(100% - 86px);
   .el-menu {
     height: 100%;
   }

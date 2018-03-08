@@ -14,13 +14,16 @@
     "axios": "^0.18.0",
     "echarts": "^4.0.3",
     "element-ui": "^2.2.0",
+    "font-awesome": "^4.7.0",
     "less": "^3.0.1",
     "less-loader": "^4.0.6",
     "node-sass": "^4.7.2",
+    "s-": "^0.0.1",
     "sass-loader": "^6.0.6",
     "vue": "^2.5.2",
     "vue-i18n": "^7.4.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

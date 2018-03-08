@@ -1,6 +1,6 @@
 <template>
   <!-- <div>  -->
-  <el-menu @select="menuSelect" default-active="account" :router="true" background-color="#313541" text-color="#707783" active-text-color="#f6f5fa" style="border-radius:none">
+  <el-menu @select="menuSelect" :default-active="route" :router="true" background-color="#313541" text-color="#707783" active-text-color="#f6f5fa" style="border-radius:none">
     <el-menu-item-group>
       <el-menu-item index="account">
         <i class="el-icon-menu"></i>帐户管理
@@ -57,11 +57,14 @@ export default {
       // activePane: this.$route.path.substring(1)
     };
   },
+  computed: {
+    route() {
+      return this.$route.name.toLowerCase();
+    }
+  },
   methods: {
-    primary(item) {
-      console.log(item);
-    },
     menuSelect(i) {
+      // console.log(this.$route.path);
       // window.location.href = `/${i}`;
       // this.$router.push(i);
       // this.$emit("routerChange", i);

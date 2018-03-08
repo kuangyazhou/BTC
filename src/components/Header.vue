@@ -1,18 +1,30 @@
 <template>
   <div class="header">
     <el-row>
-      <el-col :span="3" style="margin-left:-10px;margin-right:0px;background:#00B38B">
+      <el-col :span="3" style="margin-left:-5px;margin-right:0px;background:#00B38B;">
         <span class="flex logo"><img src="@/assets/react.png" /></span>
       </el-col>
-      <el-col class="flex between" :span="21" style="height:60px;padding:0 12px;border-bottom:1px solid #e5e5e5">
+      <el-col class="flex between" :span="21" style="height:86px;padding:0 1em;border-bottom:1px solid #e5e5e5">
         <div class="flex center">
           <span class="flex f26">
             <!--  -->
             网站后台管理系统</span>
         </div>
         <div class="flex center">
+          <!-- <i class="el-icon-info"></i> -->
           <span class="flex">
-            <i class="el-icon-info"></i>Admin</span>
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                <i class="fa fa-user"></i>
+                Admin
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>退出</el-dropdown-item>
+                <el-dropdown-item>修改密码</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </span>
         </div>
       </el-col>
     </el-row>
@@ -28,10 +40,20 @@
 
 <script>
 import Vue from "vue";
-import { Row, Col, Icon } from "element-ui";
+import {
+  Row,
+  Col,
+  Icon,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem
+} from "element-ui";
 Vue.use(Row);
 Vue.use(Col);
 Vue.use(Icon);
+Vue.use(Dropdown);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
 
 export default {
   data() {
@@ -47,12 +69,12 @@ export default {
   /* background: #545c64; */
   /* background: #181b2a; */
   /* color: #c7cce6; */
-  height: 60px;
+  height: 86px;
 }
 .logo {
-  width: 60px;
-  height: 60px;
-  padding-left: calc(50% - 30px);
+  width: 86px;
+  height: 86px;
+  padding-left: calc(50% - 43px);
 }
 .logo img {
   width: 100%;
