@@ -1,19 +1,22 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <div>
+    <Proxy></Proxy>
   </div>
 </template>
 
 <script>
+import Proxy from "@/components/common/proxy";
 export default {
-  name: 'Product',
-  data () {
+  components: { Proxy },
+  name: "Product",
+  data() {
     return {
-      msg: 'product'
-    }
+      msg: "product"
+    };
   }
-}
+};
 </script>
 
 <style scoped>
+
 </style>

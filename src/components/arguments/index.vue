@@ -13,7 +13,7 @@
                                         </el-table-column>
                                         <el-table-column label="操作" align="center">
                                                 <template slot-scope="scope">
-                                                        <el-button size="mini" type="danger" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                                                        <el-button size="mini" type="danger" @click="handleEdit(scope.$index, scope.row,'price')">修改</el-button>
                                                 </template>
                                         </el-table-column>
                                 </el-table>
@@ -115,7 +115,7 @@
                                 </el-table>
                         </el-tab-pane>
                         <el-tab-pane label="持仓数量" name="six">
-                                <el-table :data="tableOvernightFeeData" stripe style="width: 980px">
+                                <el-table :data="tableorderLimitData" stripe style="width: 980px">
                                         <el-table-column prop="id" label="#" align="center" width="60px">
                                         </el-table-column>
                                         <el-table-column prop="level_name" label="商品名称" align="center" width="100px">
@@ -139,15 +139,94 @@
                                         </el-table-column>
                                 </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="风险阈值" name="seven">定时任务补偿</el-tab-pane>
-                        <el-tab-pane label="报价点差" name="eight">定时任务补偿</el-tab-pane>
-                        <el-tab-pane label="审核设置" name="night">定时任务补偿</el-tab-pane>
-                        <el-tab-pane label="汇率设置" name="ten">定时任务补偿</el-tab-pane>
-                        <el-tab-pane label="最大吃货量" name="eleven">定时任务补偿</el-tab-pane>
+                        <el-tab-pane label="风险阈值" name="seven">
+                                <div style="width: 400px;">
+                                        <el-form ref="form" :model="form" label-width="150px">
+                                                <el-form-item label="会员预警补仓比率：">
+                                                        <el-input v-model="riskData.name" size="small">
+                                                                <template slot="append">%</template>
+                                                        </el-input>
+                                                </el-form-item>
+                                                <el-form-item label="会员预警斩仓比率：">
+                                                        <el-input v-model="riskData.name" size="small">
+                                                                <template slot="append">%</template>
+                                                        </el-input>
+                                                </el-form-item>
+                                                <el-form-item>
+                                                </el-form-item>
+                                        </el-form>
+                                        <div style="margin-left: 50px;">
+                                                <el-button type="primary" @click="onRiskSubmit">保存</el-button>
+                                                <el-button>取消</el-button>
+                                                <el-button>刷新</el-button>
+                                        </div>
+                                </div>
+                        </el-tab-pane>
+                        <el-tab-pane label="报价点差" name="eight">
+                                <el-table :data="tableorderDiffData" stripe style="width: 560px">
+                                        <el-table-column prop="id" label="#" align="center" width="60px">
+                                        </el-table-column>
+                                        <el-table-column prop="level_name" label="商品名称" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="price_percentage" label="类型" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="duration" label="价点差" align="center" width="120px">
+                                        </el-table-column>
+                                        <el-table-column label="操作" align="center">
+                                                <template slot-scope="scope">
+                                                        <el-button size="mini" type="danger" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                                                </template>
+                                        </el-table-column>
+                                </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane label="审核设置" name="night">
+                                <el-table :data="tableorderDiffData" stripe style="width: 700px">
+                                        <el-table-column prop="id" label="#" align="center" width="60px">
+                                        </el-table-column>
+                                        <el-table-column prop="level_name" label="商品名称" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="price_percentage" label="类型" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="duration" label="免审核" align="center" width="120px">
+                                        </el-table-column>
+                                        <el-table-column prop="duration" label="大单组审核" align="center" width="120px">
+                                        </el-table-column>
+                                        <el-table-column label="操作" align="center">
+                                                <template slot-scope="scope">
+                                                        <el-button size="mini" type="danger" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                                                </template>
+                                        </el-table-column>
+                                </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane label="汇率设置" name="ten">
+                                <el-table :data="tableorderDiffData" stripe style="width: 560px">
+                                        <el-table-column prop="id" label="#" align="center" width="60px">
+                                        </el-table-column>
+                                        <el-table-column prop="level_name" label="商品名称" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="price_percentage" label="类型" align="center" width="100px">
+                                        </el-table-column>
+                                        <el-table-column prop="duration" label="美金汇率" align="center" width="120px">
+                                        </el-table-column>
+                                        <el-table-column label="操作" align="center">
+                                                <template slot-scope="scope">
+                                                        <el-button size="mini" type="danger" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+                                                </template>
+                                        </el-table-column>
+                                </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane label="最大吃货量" name="eleven">定时任务补偿4</el-tab-pane>
                 </el-tabs>
+                <!-- 各个设置的弹窗部份 -->
+                <el-dialog title="价格熔断设置" :visible.sync="dialogPriceVisible" width="30%" :before-close="handleClose">
+                        <span>这是一段信息</span>
+                        <span slot="footer" class="dialog-footer">
+                                <el-button @click="dialogVisible = false">取 消</el-button>
+                                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                        </span>
+                </el-dialog>
         </div>
 </template>
-
 <script>
 import Vue from "vue";
 import request from "@/utils/request";
@@ -183,7 +262,11 @@ export default {
       tableDepositData: [],
       tableTradingPermissionsData: [],
       tableServiceFeeData: [],
-      tableOvernightFeeData: []
+      tableOvernightFeeData: [],
+      tableorderLimitData: [],
+      riskData: {},
+      tableorderDiffData: [],
+      dialogPriceVisible: false
     };
   },
   mounted() {
@@ -194,6 +277,7 @@ export default {
       this.getData(tab.$options.propsData.name);
       console.log(tab, event);
     },
+
     getData(tab) {
       var url;
       let that = this;
@@ -209,6 +293,11 @@ export default {
           });
           break;
       }
+    },
+    onRiskSubmit() {},
+    handleEdit(index, row, type) {
+      alert(1111);
+      // console.log(index,row,type);
     }
   }
 };

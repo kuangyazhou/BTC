@@ -47,7 +47,14 @@ export default new Router({
         {
           path: '/arguments',
           name: 'Arguments',
-          component: Arguments
+          component: Arguments,
+          children: [
+              {
+                  path: '/',
+                  component: Account,
+              },
+              { path: '*', component: notFound }
+          ]
         },
         {
           path: '/money',

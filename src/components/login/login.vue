@@ -149,9 +149,12 @@ export default {
               if (e.data.status) {
                 Message({
                   message: this.$t("message.loginSuccess"),
-                  type: "success"
+                  type: "success",
+                  duration: 1500,
+                  onClose: () => {
+                    this.$router.push("account");
+                  }
                 });
-                this.$router.push("account");
               }
               if (e.data.msg == 1) {
                 this.form.formError = "err1";

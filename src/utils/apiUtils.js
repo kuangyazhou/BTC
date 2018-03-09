@@ -11,6 +11,13 @@ export function loadToken() {
   return localStorage.getItem(USER_ID_TOKEN);
 }
 
+export function setUserInfo(user) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
+
+export function getUserInfo() {
+  return JSON.stringify(localStorage.getItem('user'));
+}
 // "proxy": {
 //     "/": {
 //       "target": "http://192.168.123.10",

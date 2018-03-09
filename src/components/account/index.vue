@@ -2,6 +2,7 @@
   <div class="account">
     <el-row type="flex" justify="space-between">
       <el-col :span="16">
+        <!-- {{'11130' | currency}} -->
         <el-row>
           <el-col :span="8">
             一级代理名称:
@@ -74,8 +75,6 @@
               <el-dropdown @command="operate">
                 <span class="el-dropdown-link">
                   <i class="fa fa-chevron-down"></i>
-                  <!-- 操作 -->
-                  <!-- <i class="el-icon-arrow-down el-icon-right"></i> -->
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item command='update'>修改</el-dropdown-item>
@@ -88,91 +87,30 @@
         </el-table>
       </el-col>
     </el-row>
-    <!-- <el-button type="primary" @click="primary">主要按钮</el-button> -->
-    <!-- <div id="main" style="width:1000px;height:500px;"></div> -->
-    <!-- <el-row :gutter="10">
-      <el-col :span="5">
-        <span>管理员帐号</span>
-        <el-input class="w100" size="mini" prefix-icon="el-icon-search"></el-input>
-      </el-col>
-      <el-col :span="5">
-        <span>管理员名称</span>
-        <el-input class="w100" size="mini" prefix-icon="el-icon-search"></el-input>
-      </el-col>
-      <el-col :span="5">
-        <span>管理员状态</span>
-        <el-input class="w100" size="mini" prefix-icon="el-icon-search"></el-input>
-      </el-col>
-      <el-col :span="8" :push="3">
-        <el-button size="mini">查询</el-button>
-        <el-button size="mini">重置</el-button>
-      </el-col>
-    </el-row>
-    <el-row :gutter="2" style="margin-top:1em;">
-      <el-col :span="24">
-        <el-button size="mini" type="primary" @click="add">新增</el-button>
-        <el-button size="mini" type="primary">修改基础信息</el-button>
-        <el-button size="mini">修改登录密码</el-button>
-        <el-button size="mini">角色分配</el-button>
-        <el-button size="mini">详细</el-button>
-      </el-col>
-    </el-row>
-    <el-row :gutter="2" style="margin-top:1em;">
-      <el-col :span="22">
-        <el-table :border="false" size="mini" :data="tableData" style="width: 100%">
-          <el-table-column type="selection" align="center">
-          </el-table-column>
-          <el-table-column type="index" align="center">
-          </el-table-column>
-          <el-table-column prop="name" align="center" label="管理员帐户">
-          </el-table-column>
-          <el-table-column prop="nickname" align="center" label="管理员名称">
-          </el-table-column>
-          <el-table-column prop="role" align="center" label="所属角色">
-          </el-table-column>
-          <el-table-column prop="status" align="center" label="状态">
-          </el-table-column>
-          <el-table-column prop="control" align="center" label="是否允许登录风控端">
-          </el-table-column>
-          <el-table-column prop="createTime" align="center" label="创建时间">
-          </el-table-column>
-          <el-table-column prop="validTime" align="center" label="有效时间">
-          </el-table-column>
-          <el-table-column prop="lastLogin" align="center" label="上次登录时间">
-          </el-table-column>
-          <el-table-column prop="lastIp" align="center" label="上次登录ip">
-          </el-table-column>
-          <el-table-column prop="des" align="center" label="描述">
-          </el-table-column>
-        </el-table>
-      </el-col>
-    </el-row> -->
     <el-dialog title="新增一级代理" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" width="90%" :before-close="handleClose">
       <el-form label-width="100px" :inline="true" ref="form" size="mini" :rules="rules" :model="form">
         <el-row>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item label="一级代理帐号" prop="account">
               <el-input v-model="form.account" name="username"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item label="一级代理名称" prop="name">
               <el-input v-model="form.name" name="name"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item label="密码" prop="password">
               <el-input v-model="form.password" type="password" name="pwd"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item label="确认密码" prop="confirm">
               <el-input type="password" v-model="form.confirm" name="confirm"></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item style="width:100%" label="现金or信用">
               <el-select size="mini" v-model="form.type" style="width:92%">
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
@@ -180,19 +118,31 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="4">
             <el-form-item label="一级代理及下级占成总数" prop="total">
               <el-input v-model="form.total" name="total"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+        </el-row>
+        <el-row>
+          <el-col :span="4">
             <el-form-item label="信用额度" prop="limit">
               <el-input v-model="form.limit" name="belive"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
-            <el-form-item label="手续费比例" prop="charge">
-              <el-input v-model="form.charge" name="charge"></el-input>
+          <el-col :span="4">
+            <el-form-item label="买入手续费" prop="buyCharge">
+              <el-input v-model="form.buyCharge" name="buyCharge"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="最大亏损" prop="saleCharge">
+              <el-input v-model="form.saleCharge"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="卖出手续费" prop="saleCharge">
+              <el-input v-model="form.saleCharge"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -207,14 +157,6 @@
         <el-col>
           <el-table :data="frozenData" :border="false" size="mini" style="width: 20%">
             <el-table-column align="center" prop="productName" label="商品名称"></el-table-column>
-            <!-- <el-table-column label="单笔冻结保证金">
-              <template slot-scope="scope">
-                <el-select size="mini" v-model="form.type">
-                  <el-option v-for="item in frozen" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column> -->
             <el-table-column align="center" label="单笔冻结保证金">
               <template slot-scope="scope">
                 <el-select size="mini" v-model="frozenModel">
@@ -243,46 +185,26 @@
             <el-table-column prop="productName" align="center" label="商品名称"></el-table-column>
             <el-table-column align="center" label="单笔最小交易量">
               <template slot-scope="scope">
-                <!-- <el-select size="mini" v-model="minDeal">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
                 <el-input v-model="form.charge" size="mini"></el-input>
               </template>
             </el-table-column>
             <el-table-column align="center" label="单笔最大交易量">
               <template slot-scope="scope">
-                <!-- <el-select size="mini" v-model="maxDeal">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
                 <el-input v-model="form.charge" size="mini"></el-input>
               </template>
             </el-table-column>
             <el-table-column align="center" label="最大买持货量">
               <template slot-scope="scope">
-                <!-- <el-select size="mini" v-model="maxKeep">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
                 <el-input v-model="form.charge" size="mini"></el-input>
               </template>
             </el-table-column>
             <el-table-column align="center" label="最大卖持货量">
               <template slot-scope="scope">
-                <!-- <el-select size="mini" v-model="maxSale">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
                 <el-input v-model="form.charge" size="mini"></el-input>
               </template>
             </el-table-column>
             <el-table-column align="center" label="最大净持货量">
               <template slot-scope="scope">
-                <!-- <el-select size="mini" v-model="maxRemain">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
                 <el-input v-model="form.charge" size="mini"></el-input>
               </template>
             </el-table-column>
@@ -383,6 +305,9 @@ import {
   DropdownItem
 } from "element-ui";
 import echarts from "echarts";
+
+import { Proxy } from "@/components/common/proxy";
+
 Vue.use(Button);
 Vue.use(Input);
 Vue.use(Row);
@@ -401,6 +326,7 @@ Vue.use(DropdownItem);
 
 export default {
   name: "Account",
+  components: {},
   data() {
     return {
       msg: "account",
@@ -468,7 +394,8 @@ export default {
         type: "cash",
         total: "",
         limit: "",
-        charge: ""
+        buyCharge: "",
+        saleCharge: ""
       },
       oneData: [
         {
@@ -597,7 +524,15 @@ export default {
       ]
     };
   },
+  computed: {
+    // userInfo(){
+    //  this.$store.state.userName
+    // }
+  },
   mounted() {
+    localStorage.setItem("user", JSON.stringify({ a: 1, b: 2 }));
+    console.log(JSON.parse(localStorage.getItem("user")));
+    console.log(new Date().Format("yyyy年MM月dd日")); //日期格式化导入
     let upColor = "#ec0000";
     let upBorderColor = "#8A0000";
     let downColor = "#00da3c";

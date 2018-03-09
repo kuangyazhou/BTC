@@ -4,15 +4,16 @@ import {
 
 import {
   loadToken,
-  setToken
+  setToken,
+  setUserInfo
 } from '@/utils/apiUtils';
 
 import router from '@/router';
 
 const user = {
   state: {
-    userName: 1,
-    level: 1
+    userName: null,
+    level: null
   },
   mutations: {
     SET_USER: (state, user) => {
@@ -33,7 +34,8 @@ const user = {
       // return new Promise((resolve, reject) => {
       return login(name, password).then(response => {
         setToken(response.headers.authorization);
-        commit('SET_USER', response);
+        commit('SET_USER', response.data);
+        setUserInfo(response.data);
         return response;
         // msg 1 账号密码不对 2 异常
         // console.log(response);
