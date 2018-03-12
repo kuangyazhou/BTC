@@ -1,25 +1,35 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-const Login = () => import('@/components/login/login');
-const Register = () => import('@/components/login/register');
-const Home = () => import('@/components/Home');
-const Account = () => import('@/components/account/index');
-const Arguments = () => import('@/components/arguments/index');
-const Money = () => import('@/components/money/index');
-const Notice = () => import('@/components/notice/index');
-const Product = () => import('@/components/product/index');
-const Receive = () => import('@/components/receive/index');
-const StateMent = () => import('@/components/statement/index');
+const Login = () =>
+  import ('@/components/login/login');
+const Register = () =>
+  import ('@/components/login/register');
+const Home = () =>
+  import ('@/components/Home');
+const Account = () =>
+  import ('@/components/account/index');
+const Arguments = () =>
+  import ('@/components/arguments/index');
+const Money = () =>
+  import ('@/components/money/index');
+const Notice = () =>
+  import ('@/components/notice/index');
+const Product = () =>
+  import ('@/components/product/index');
+const Receive = () =>
+  import ('@/components/receive/index');
+const StateMent = () =>
+  import ('@/components/statement/index');
 
-const notFound = () => import('@/components/404/index');
+const notFound = () =>
+  import ('@/components/404/index');
 
 Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  routes: [
-    {
+  routes: [{
       path: '/login',
       name: Login,
       component: Login
@@ -34,8 +44,7 @@ export default new Router({
     {
       path: '/home',
       component: Home,
-      children: [
-        {
+      children: [{
           path: '/',
           component: Account,
         },
@@ -48,13 +57,13 @@ export default new Router({
           path: '/arguments',
           name: 'Arguments',
           component: Arguments,
-          children: [
-              {
-                  path: '/',
-                  component: Account,
-              },
-              { path: '*', component: notFound }
-          ]
+          // children: [
+          //     {
+          //         path: '/',
+          //         component: Account,
+          //     },
+          //     { path: '*', component: notFound }
+          // ]
         },
         {
           path: '/money',
@@ -81,9 +90,15 @@ export default new Router({
           name: 'StateMent',
           component: StateMent
         },
-        { path: '*', component: notFound }
+        {
+          path: '*',
+          component: notFound
+        }
       ]
     },
-    { path: '*', component: notFound }
+    {
+      path: '*',
+      component: notFound
+    }
   ]
 })

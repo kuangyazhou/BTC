@@ -5,7 +5,8 @@ import {
 import {
   loadToken,
   setToken,
-  setUserInfo
+  setUserInfo,
+  getUserInfo
 } from '@/utils/apiUtils';
 
 import router from '@/router';
@@ -23,6 +24,7 @@ const user = {
     LOGIN_OUT: (state) => {
       setToken('user_id_token', null);
       window.localStorage.removeItem('user_id_token');
+      window.localStorage.removeItem('user');
     }
   },
   actions: {
@@ -33,9 +35,10 @@ const user = {
       const password = userInfo.pwd;
       // return new Promise((resolve, reject) => {
       return login(name, password).then(response => {
-        setToken(response.headers.authorization);
+        // 当res中带有token并且与本地token不同时，更新一次;
+        // setToken(response.headers.authorization);
         commit('SET_USER', response.data);
-        setUserInfo(response.data);
+        setUserInfo(response.data.data);
         return response;
         // msg 1 账号密码不对 2 异常
         // console.log(response);

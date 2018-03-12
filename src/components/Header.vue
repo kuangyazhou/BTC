@@ -13,15 +13,15 @@
         <div class="flex center">
           <!-- <i class="el-icon-info"></i> -->
           <span class="flex">
-            <el-dropdown>
+            <el-dropdown @command="operate">
               <span class="el-dropdown-link">
                 <i class="fa fa-user"></i>
-                Admin
+                {{userName}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>退出</el-dropdown-item>
-                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item command='logout'>退出</el-dropdown-item>
+                <el-dropdown-item command='update'>修改密码</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </span>
@@ -46,7 +46,8 @@ import {
   Icon,
   Dropdown,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Message
 } from "element-ui";
 Vue.use(Row);
 Vue.use(Col);
@@ -60,6 +61,33 @@ export default {
     return {
       msg: "This is the Header"
     };
+  },
+  computed: {
+    userName() {
+      return (
+        this.$store.state.user.userName ||
+        JSON.parse(localStorage.getItem("user")).user_name
+      );
+    }
+  },
+  mounted() {
+    // console.log(getUserInfo());
+  },
+  methods: {
+    operate(e) {
+      if (e == "logout") {
+        this.$store.commit("LOGIN_OUT");
+        Message({
+          center: true,
+          message: "退出成功",
+          type: "success",
+          duration: 1800,
+          onClose: () => {
+            window.location.replace("/login");
+          }
+        });
+      }
+    }
   }
 };
 </script>

@@ -286,7 +286,13 @@ export default {
           url = "/index.php?r=btc/config/price-blown";
           request({
             method: "get",
-            url: url
+            url: url,
+            data: {
+              firstName: "Fred"
+            }
+            //     params: {
+            //       ID: 12345
+            //     }
           }).then(res => {
             that.tableBlownData = res.data.data;
             console.log(this.tableBlownData);

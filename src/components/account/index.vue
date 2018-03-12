@@ -1,8 +1,8 @@
 <template>
   <div class="account">
-    <el-row type="flex" justify="space-between">
+    <Proxy :level="2"></Proxy>
+    <!-- <el-row type="flex" justify="space-between">
       <el-col :span="16">
-        <!-- {{'11130' | currency}} -->
         <el-row>
           <el-col :span="8">
             一级代理名称:
@@ -146,12 +146,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <!-- <el-row>
-        </el-row> -->
-        <!-- <el-form-item label="支付通道">
-          <el-radio v-model="patyType" label="1">支付宝</el-radio>
-          <el-radio v-model="patyType" label="2">银行卡</el-radio>
-        </el-form-item> -->
       </el-form>
       <el-row>
         <el-col>
@@ -211,7 +205,7 @@
           </el-table>
         </el-col>
         <el-col style="margin-top:0.5em">
-          <!-- 表头合并后,hover颜色永久存在 -->
+          表头合并后,hover颜色永久存在
           <el-table :data="wareData" :border="false" size="mini" style="width: 100%">
             <el-table-column prop="productName" align="center" label="商品名称"></el-table-column>
             <el-table-column align="center" label="显示权限">
@@ -281,7 +275,7 @@
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
         <el-button size="mini" type="primary" @click="onSubmit">确 定</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -306,7 +300,7 @@ import {
 } from "element-ui";
 import echarts from "echarts";
 
-import { Proxy } from "@/components/common/proxy";
+import Proxy from "@/components/common/proxy";
 
 Vue.use(Button);
 Vue.use(Input);
@@ -326,7 +320,7 @@ Vue.use(DropdownItem);
 
 export default {
   name: "Account",
-  components: {},
+  components: { Proxy },
   data() {
     return {
       msg: "account",
@@ -530,9 +524,7 @@ export default {
     // }
   },
   mounted() {
-    localStorage.setItem("user", JSON.stringify({ a: 1, b: 2 }));
-    console.log(JSON.parse(localStorage.getItem("user")));
-    console.log(new Date().Format("yyyy年MM月dd日")); //日期格式化导入
+    // console.log(new Date().Format("yyyy年MM月dd日")); //日期格式化导入
     let upColor = "#ec0000";
     let upBorderColor = "#8A0000";
     let downColor = "#00da3c";

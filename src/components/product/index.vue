@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Proxy></Proxy>
+    <Proxy title="二级"></Proxy>
   </div>
 </template>
 

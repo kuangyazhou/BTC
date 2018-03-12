@@ -5,11 +5,11 @@
                 <!-- {{'11130' | currency}} -->
                 <el-row>
                     <el-col :span="8">
-                        一级代理名称:
+                        {{title}}代理名称:
                         <el-input class="w100" size="mini"></el-input>
                     </el-col>
                     <el-col :span="8" :offset="1">
-                        一级代理帐号:
+                        {{title}}代理帐号:
                         <el-input size="mini" class="w100"></el-input>
                     </el-col>
                 </el-row>
@@ -25,18 +25,18 @@
                 <el-table :border="false" size="mini" :data="oneData" style="width: 100%">
                     <el-table-column type="index" align="center">
                     </el-table-column>
-                    <el-table-column prop="name" align="center" label="一级代理名称">
+                    <el-table-column prop="name" align="center" :label="title+'代理名称'">
                         <template slot-scope="scope">
                             <el-button size="mini" type="info">{{scope.row.name}}</el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="account" align="center" label="一级代理帐号">
+                    <el-table-column prop="account" align="center" :label="title+'代理帐号'">
                     </el-table-column>
                     <el-table-column prop="limit" align="center" label="信用额度" width="80">
                     </el-table-column>
                     <el-table-column prop="balance" align="center" label="信用余额" width="80">
                     </el-table-column>
-                    <el-table-column prop="one" align="center" label="一级代理" width="80">
+                    <el-table-column prop="one" align="center" :label="title+'代理'" width="80">
                         <template slot-scope="scope">
                             <el-button size="mini" type="info">{{scope.row.one}}</el-button>
                         </template>
@@ -148,16 +148,16 @@
         </el-table>
       </el-col>
     </el-row> -->
-        <el-dialog title="新增一级代理" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" width="90%" :before-close="handleClose">
+        <el-dialog :title="'新增'+title+'代理'" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" width="90%" :before-close="handleClose">
             <el-form label-width="100px" :inline="true" ref="form" size="mini" :rules="rules" :model="form">
                 <el-row>
                     <el-col :span="6">
-                        <el-form-item label="一级代理帐号" prop="account">
+                        <el-form-item :label="title+'代理帐号'" prop="account">
                             <el-input v-model="form.account" name="username"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col :span="6">
-                        <el-form-item label="一级代理名称" prop="name">
+                        <el-form-item :label="title+'代理名称'" prop="name">
                             <el-input v-model="form.name" name="name"></el-input>
                         </el-form-item>
                     </el-col>
@@ -182,7 +182,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="6">
-                        <el-form-item label="一级代理及下级占成总数" prop="total">
+                        <el-form-item :label="title+'代理及下级占成总数'" prop="total">
                             <el-input v-model="form.total" name="total"></el-input>
                         </el-form-item>
                     </el-col>
@@ -400,6 +400,7 @@ Vue.use(DropdownMenu);
 Vue.use(DropdownItem);
 
 export default {
+  name: "Proxy",
   data() {
     return {
       msg: "account",
@@ -595,6 +596,16 @@ export default {
         }
       ]
     };
+  },
+  props: {
+    title: {
+      type: String,
+      default: "一级"
+    },
+    level: {
+      type: Number,
+      default: 1
+    }
   },
   methods: {
     add() {
