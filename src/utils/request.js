@@ -45,9 +45,8 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use(
   response => {
     let old = loadToken();
-    let val = response;
     // 返回status为-1时,状态为退出,跳转至登录;
-    if (val == -1) {
+    if (response.data.status == -1) {
       console.log('身份已过期');
       store.commit('LOGIN_OUT');
       Message({
@@ -60,8 +59,8 @@ service.interceptors.response.use(
       });
     }
     // response时验证token，返回token并且与本地不同时，存储
-    if (val.headers.authorization && val.headers.authorization != old) {
-      setToken(val.headers.authorization);
+    if (response.headers.authorization && response.headers.authorization != old) {
+      setToken(response.headers.authorization);
     }
     return response;
   },

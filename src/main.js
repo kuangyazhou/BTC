@@ -6,9 +6,12 @@ import router from './router'
 import i18n from '@/i18n/i18n';
 import store from '@/store';
 
+
 import {
   currency
 } from '@/utils/currency';
+
+import '@/mock/index.js';
 
 import '@/utils/format';
 import '@/assets/css/normalize.css';

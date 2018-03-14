@@ -5,15 +5,13 @@
 </template>
 
 <script>
-import echarts from "echarts";
 export default {
-  name: "StateMent",
+  name: "Register",
   data() {
     return {
-      msg: "statement"
+      msg: "register"
     };
-  },
-  mounted() {}
+  }
 };
 </script>
 

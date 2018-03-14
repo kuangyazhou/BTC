@@ -2,7 +2,6 @@
     <div class="common-proxy">
         <el-row type="flex" justify="space-between">
             <el-col :span="16">
-                <!-- {{'11130' | currency}} -->
                 <el-row>
                     <el-col :span="8">
                         {{title}}代理名称:
@@ -75,8 +74,6 @@
                             <el-dropdown @command="operate">
                                 <span class="el-dropdown-link">
                                     <i class="fa fa-chevron-down"></i>
-                                    <!-- 操作 -->
-                                    <!-- <i class="el-icon-arrow-down el-icon-right"></i> -->
                                 </span>
                                 <el-dropdown-menu slot="dropdown">
                                     <el-dropdown-item command='update'>修改</el-dropdown-item>
@@ -148,7 +145,7 @@
         </el-table>
       </el-col>
     </el-row> -->
-        <el-dialog :title="'新增'+title+'代理'" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" width="90%" :before-close="handleClose">
+        <el-dialog :title="status+title+'代理'" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="dialogVisible" width="90%" :before-close="handleClose">
             <el-form label-width="100px" :inline="true" ref="form" size="mini" :rules="rules" :model="form">
                 <el-row>
                     <el-col :span="6">
@@ -175,7 +172,7 @@
                 <el-row>
                     <el-col :span="6">
                         <el-form-item style="width:100%" label="现金or信用">
-                            <el-select size="mini" v-model="form.type" style="width:92%">
+                            <el-select size="mini" @change="crashCredit" v-model="form.type" style="width:92%">
                                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
                                 </el-option>
                             </el-select>
@@ -197,25 +194,11 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <!-- <el-row>
-        </el-row> -->
-                <!-- <el-form-item label="支付通道">
-          <el-radio v-model="patyType" label="1">支付宝</el-radio>
-          <el-radio v-model="patyType" label="2">银行卡</el-radio>
-        </el-form-item> -->
             </el-form>
             <el-row>
                 <el-col>
                     <el-table :data="frozenData" :border="false" size="mini" style="width: 20%">
                         <el-table-column align="center" prop="productName" label="商品名称"></el-table-column>
-                        <!-- <el-table-column label="单笔冻结保证金">
-              <template slot-scope="scope">
-                <el-select size="mini" v-model="form.type">
-                  <el-option v-for="item in frozen" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column> -->
                         <el-table-column align="center" label="单笔冻结保证金">
                             <template slot-scope="scope">
                                 <el-select size="mini" v-model="frozenModel">
@@ -231,10 +214,7 @@
                         <el-table-column align="center" prop="productName" label="商品名称"></el-table-column>
                         <el-table-column align="center" label="点差返佣">
                             <template slot-scope="scope">
-                                <el-select size="mini" v-model="reBateModel">
-                                    <el-option v-for="item in frozen" :key="item.value" :label="item.label" :value="item.value">
-                                    </el-option>
-                                </el-select>
+                                <el-input size="mini" v-model="reBateModel"></el-input>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -244,47 +224,27 @@
                         <el-table-column prop="productName" align="center" label="商品名称"></el-table-column>
                         <el-table-column align="center" label="单笔最小交易量">
                             <template slot-scope="scope">
-                                <!-- <el-select size="mini" v-model="minDeal">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
-                                <el-input v-model="form.charge" size="mini"></el-input>
+                                <el-input v-model="form.credit.single_min_transaction" size="mini"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column align="center" label="单笔最大交易量">
                             <template slot-scope="scope">
-                                <!-- <el-select size="mini" v-model="maxDeal">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
-                                <el-input v-model="form.charge" size="mini"></el-input>
+                                <el-input v-model="form.credit.single_max_transaction" size="mini"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column align="center" label="最大买持货量">
                             <template slot-scope="scope">
-                                <!-- <el-select size="mini" v-model="maxKeep">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
-                                <el-input v-model="form.charge" size="mini"></el-input>
+                                <el-input v-model="form.credit.max_buy_limit" size="mini"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column align="center" label="最大卖持货量">
                             <template slot-scope="scope">
-                                <!-- <el-select size="mini" v-model="maxSale">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
-                                <el-input v-model="form.charge" size="mini"></el-input>
+                                <el-input v-model="form.credit.max_sale_limit" size="mini"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column align="center" label="最大净持货量">
                             <template slot-scope="scope">
-                                <!-- <el-select size="mini" v-model="maxRemain">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                  </el-option>
-                </el-select> -->
-                                <el-input v-model="form.charge" size="mini"></el-input>
+                                <el-input v-model="form.credit.max_net_limit" size="mini"></el-input>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -295,7 +255,7 @@
                         <el-table-column prop="productName" align="center" label="商品名称"></el-table-column>
                         <el-table-column align="center" label="显示权限">
                             <template slot-scope="scope">
-                                <el-select size="mini" v-model="wareLimits.showLimit">
+                                <el-select size="mini" v-model="form.credit.showLimit">
                                     <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                     </el-option>
                                 </el-select>
@@ -304,7 +264,7 @@
                         <el-table-column align="center" label="建仓">
                             <el-table-column align="center" label="挂单买入">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.buildBuy">
+                                    <el-select size="mini" v-model="form.credit.open_order_buy">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -312,7 +272,7 @@
                             </el-table-column>
                             <el-table-column align="center" label="挂单卖出">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.buildSale">
+                                    <el-select size="mini" v-model="form.credit.open_order_sale">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -320,7 +280,7 @@
                             </el-table-column>
                             <el-table-column align="center" label="挂单撤销">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.buildRepeal">
+                                    <el-select size="mini" v-model="form.credit.open_order_undo">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -330,7 +290,7 @@
                         <el-table-column align="center" label="平仓">
                             <el-table-column align="center" label="挂单买入">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.equalBuy">
+                                    <el-select size="mini" v-model="form.credit.close_order_buy">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -338,7 +298,7 @@
                             </el-table-column>
                             <el-table-column align="center" label="挂单卖出">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.equalSale">
+                                    <el-select size="mini" v-model="form.credit.close_order_sale">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -346,7 +306,7 @@
                             </el-table-column>
                             <el-table-column align="center" label="挂单撤销">
                                 <template slot-scope="scope">
-                                    <el-select size="mini" v-model="wareLimits.equalRepeal">
+                                    <el-select size="mini" v-model="form.credit.close_order_undo">
                                         <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                                         </el-option>
                                     </el-select>
@@ -360,6 +320,43 @@
                 <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
                 <el-button size="mini" type="primary" @click="onSubmit">确 定</el-button>
             </span>
+        </el-dialog>
+        <el-dialog title="出入金" :close-on-press-escape="false" :before-close="comeinClose" :close-on-click-modal="false" :visible.sync="comeinSwitch">
+            <div class="base-info">基础信息</div>
+            <el-form label-width="120px" :inline="true" ref="comein" size="mini" :model="comein">
+                <el-row>
+                    <el-col :span=12>
+                        <el-form-item label="调整类型:" prop="types">
+                            <el-select size="mini" v-model="comein.type">
+                                <el-option v-for="item in changeType" :key="item.value" :label="item.label" :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span=12>
+                        <el-form-item label="调整额度" prop="fuck">
+                            <el-input type="number"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                        <el-form-item label="信用余额:" prop="king">
+                            <el-input v-model="comein.balance" :readonly="true"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+        </el-dialog>
+        <el-dialog title="选择一级代理商" :visible.sync="onProxySwitch" :before-close="onProxyClose">
+            <el-form>
+                <el-form-item>
+                    <el-select size="mini" v-model="reBateModel">
+                        <el-option v-for="item in frozen" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
         </el-dialog>
     </div>
 </template>
@@ -377,6 +374,7 @@ import {
   TableColumn,
   Dialog,
   Radio,
+  Tag,
   Form,
   FormItem,
   Dropdown,
@@ -390,6 +388,7 @@ Vue.use(Radio);
 Vue.use(Select);
 Vue.use(Option);
 Vue.use(Col);
+Vue.use(Tag);
 Vue.use(Table);
 Vue.use(TableColumn);
 Vue.use(Dialog);
@@ -405,17 +404,14 @@ export default {
     return {
       msg: "account",
       dialogVisible: false,
+      comeinSwitch: false,
+      onProxySwitch: false,
       patyType: "1",
       minDeal: "",
       reBateModel: "10%",
-      wareLimits: {
-        showLimit: "1",
-        buildBuy: "1",
-        buildSale: "1",
-        buildRepeal: "1",
-        equalBuy: "1",
-        equalSale: "1",
-        equalRepeal: "1"
+      comein: {
+        type: "1",
+        balance: "1000"
       },
       minDealOptions: [
         {
@@ -441,22 +437,32 @@ export default {
       },
       options: [
         {
-          value: "cash",
+          value: 0,
           label: "现金"
         },
         {
-          value: "credit",
+          value: 1,
           label: "信用"
         }
       ],
       limits: [
         {
-          value: "1",
+          value: 1,
           label: "是"
         },
         {
-          value: "0",
+          value: 0,
           label: "否"
+        }
+      ],
+      changeType: [
+        {
+          value: "1",
+          label: "额度"
+        },
+        {
+          value: "2",
+          label: "费率"
         }
       ],
       form: {
@@ -465,10 +471,28 @@ export default {
         name: "",
         password: "",
         confirm: "",
-        type: "cash",
+        type: 1,
         total: "",
-        limit: "",
-        charge: ""
+        limit: 0,
+        charge: "",
+        crash: {},
+        crashLimit: {},
+        credit: {
+          single_min_transaction: null,
+          single_max_transaction: null,
+          max_buy_limit: null,
+          max_sale_limit: null,
+          max_net_limit: null,
+          open_order_buy: null,
+          open_order_sale: null,
+          open_order_undo: null,
+          close_order_buy: null,
+          close_order_sale: null,
+          close_order_undo: null,
+          showLimit: 0
+        },
+        creditLimit: {},
+        temp: {}
       },
       oneData: [
         {
@@ -505,18 +529,18 @@ export default {
           productName: "比特币"
         }
       ],
-      frozenModel: "10%",
+      frozenModel: null,
       frozen: [
         {
-          value: "10%",
+          value: 10,
           label: "10%"
         },
         {
-          value: "20%",
+          value: 20,
           label: "20%"
         },
         {
-          value: "30%",
+          value: 30,
           label: "30%"
         }
       ],
@@ -605,22 +629,116 @@ export default {
     level: {
       type: Number,
       default: 1
+    },
+    status: {
+      type: String,
+      default: "新增"
     }
   },
   methods: {
     add() {
+      if (this.level == 0) {
+        this.onProxySwitch = true;
+      } else {
+        this.dialogVisible = true;
+      }
+    },
+    onProxyClose() {
+      this.onProxySwitch = false;
+      this.addInit();
       this.dialogVisible = true;
     },
     handleClose(done) {
       this.dialogVisible = false;
+      this.$refs["form"].resetFields();
     },
-    operate() {},
-    onSubmit() {},
-    viewMember() {}
+    comeinClose(done) {
+      this.comeinSwitch = false;
+      console.log(this.$refs["comein"]);
+      //   this.$refs.comein.resetFields();
+      this.$refs["comein"].resetFields();
+    },
+    operate(e) {
+      switch (e) {
+        case "add":
+          break;
+        case "update":
+          this.status = "修改";
+          this.dialogVisible = true;
+          break;
+        case "stop":
+          break;
+        case "comein":
+          this.comeinSwitch = true;
+          this.$nextTick(() => {
+            this.$refs.comein.resetFields();
+          });
+          //   this.$refs["comein"].resetFields();
+          break;
+        default:
+          return;
+      }
+    },
+    onSubmit() {
+      let info = {
+        account: this.form.account,
+        name: this.form.name,
+        password: this.form.password,
+        repassword: this.form.confirm,
+        account_type: this.form.type,
+        share_sum: this.form.total,
+        credit: this.form.limit,
+        win_loss_limit: "",
+        open_service_fee_percentage: "",
+        close_service_fee_percentage: "",
+        deposit_frozen_percentage: this.form.credit.deposit_frozen_percentage,
+        deposit_used_percentage: this.form.credit.deposit_used_percentage,
+        order_diff_dicount_percentage: this.reBateModel,
+        single_min_transaction: this.form.credit.single_min_transaction,
+        single_max_transaction: this.form.credit.single_max_transaction,
+        max_buy_limit: this.form.credit.max_buy_limit,
+        max_sale_limit: this.form.credit.max_sale_limit,
+        max_net_limit: this.form.credit.max_net_limit,
+        open_order_buy: this.form.credit.open_order_buy,
+        open_order_sale: this.form.credit.open_order_sale,
+        open_order_undo: this.form.credit.open_order_undo,
+        close_order_buy: this.form.credit.close_order_buy,
+        close_order_sale: this.form.credit.close_order_sale,
+        close_order_undo: this.form.credit.close_order_undo
+      };
+      this.$store.dispatch("saveAgent", info);
+    },
+    addInit() {
+      this.$store.dispatch("addTopAgent").then(res => {
+        if (res.status == 200) {
+          //   console.log(res.data.data.user_credit.deposit_frozen_percentage);
+          //   this.form.credit = res.data.data.user_credit;
+          Object.assign(this.form.temp, res.data.data.user_credit);
+          Object.assign(this.form.temp, res.data.data.user_credit_limit);
+          Object.assign(this.form.crash, res.data.data.user_cash);
+          Object.assign(this.form.crashLimit, res.data.data.user_cash_limit);
+          Object.assign(this.form.credit, this.form.temp);
+          this.frozenModel =
+            res.data.data.user_credit.deposit_frozen_percentage;
+          //   console.log(this.form);
+        }
+      });
+    },
+    viewMember() {},
+    crashCredit(e) {
+      e
+        ? Object.assign(this.form.credit, this.form.temp)
+        : Object.assign(this.form.credit, this.form.crash);
+    }
   }
 };
 </script>
 
 <style scoped>
-
+.base-info {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 1em;
+  border-bottom: 1px solid #999;
+}
 </style>

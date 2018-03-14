@@ -1,6 +1,25 @@
 <template>
   <div class="account">
-    <Proxy :level="2"></Proxy>
+    <el-row>
+      <el-col>
+        <el-tabs v-model="activeName">
+          <el-tab-pane :label="'用户管理'+num" name="first">
+            <el-table :data="tableData" style="width: 100%">
+              <el-table-column prop="date" label="日期" width="180">
+              </el-table-column>
+              <el-table-column prop="name" label="姓名" width="180">
+              </el-table-column>
+              <el-table-column prop="address" label="地址">
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane :label="'配置管理'+num" name="second">配置管理</el-tab-pane>
+          <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
+          <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
+        </el-tabs>
+      </el-col>
+    </el-row>
+    <Proxy :level="0"></Proxy>
     <!-- <el-row type="flex" justify="space-between">
       <el-col :span="16">
         <el-row>
@@ -289,6 +308,8 @@ import {
   Select,
   Option,
   Table,
+  Tabs,
+  TabPane,
   TableColumn,
   Dialog,
   Radio,
@@ -301,6 +322,7 @@ import {
 import echarts from "echarts";
 
 import Proxy from "@/components/common/proxy";
+import axios from "axios";
 
 Vue.use(Button);
 Vue.use(Input);
@@ -310,6 +332,8 @@ Vue.use(Select);
 Vue.use(Option);
 Vue.use(Col);
 Vue.use(Table);
+Vue.use(Tabs);
+Vue.use(TabPane);
 Vue.use(TableColumn);
 Vue.use(Dialog);
 Vue.use(Form);
@@ -327,7 +351,9 @@ export default {
       dialogVisible: false,
       patyType: "1",
       minDeal: "",
+      num: 100,
       reBateModel: "10%",
+      activeName: "first",
       wareLimits: {
         showLimit: "1",
         buildBuy: "1",
@@ -468,52 +494,24 @@ export default {
       ],
       tableData: [
         {
-          name: "admin1",
-          nickname: "王小虎",
-          role: "上海市普陀区金沙江路 1518 弄",
-          status: "启用",
-          control: "允许",
-          createTime: "2017-08",
-          validTime: "2018-09",
-          lastLogin: "2017-10",
-          lastIp: "172.11.16",
-          des: "系统超级管理员"
+          date: "2016-05-02",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
         },
         {
-          name: "admin1",
-          nickname: "王小虎",
-          role: "上海市普陀区金沙江路 1518 弄",
-          status: "启用",
-          control: "允许",
-          createTime: "2017-08",
-          validTime: "2018-09",
-          lastLogin: "2017-10",
-          lastIp: "172.11.16",
-          des: "系统超级管理员"
+          date: "2016-05-04",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1517 弄"
         },
         {
-          name: "admin1",
-          nickname: "王小虎",
-          role: "上海市普陀区金沙江路 1518 弄",
-          status: "启用",
-          control: "允许",
-          createTime: "2017-08",
-          validTime: "2018-09",
-          lastLogin: "2017-10",
-          lastIp: "172.11.16",
-          des: "系统超级管理员"
+          date: "2016-05-01",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1519 弄"
         },
         {
-          name: "admin1",
-          nickname: "王小虎",
-          role: "上海市普陀区金沙江路 1518 弄",
-          status: "启用",
-          control: "允许",
-          createTime: "2017-08",
-          validTime: "2018-09",
-          lastLogin: "2017-10",
-          lastIp: "172.11.16",
-          des: "系统超级管理员"
+          date: "2016-05-03",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1516 弄"
         }
       ]
     };
@@ -525,6 +523,9 @@ export default {
   },
   mounted() {
     // console.log(new Date().Format("yyyy年MM月dd日")); //日期格式化导入
+    // axios.get("http://account/underProxy").then(res => {
+    //   console.log(res);
+    // });
     let upColor = "#ec0000";
     let upBorderColor = "#8A0000";
     let downColor = "#00da3c";

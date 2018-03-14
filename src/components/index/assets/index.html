@@ -1,0 +1,140 @@
+<div class="index">
+	<header>
+		bitFinex
+		<el-button type="primary" class="user-button">充值</el-button>
+		<el-button type="primary" class="user-button">提现</el-button>
+		<el-button type="primary" class="user-button">订单</el-button>
+	</header>
+	<div class="body-content">
+		<div class="left-info">
+			<div class="loginBox">
+				<el-button type="primary" class="login-button">注册</el-button>
+				<el-button type="primary" class="login-button">登陆</el-button>
+			</div>
+			<div class="member-info">
+				<div class="head">
+					会员资金
+				</div>
+				<div class="money-info">
+					<div class="user-info">
+						<div class="user-item item-left">
+							<span>会员账号</span>
+							<span>lidaming001</span>
+							<span>会员名称</span>
+							<span>李大明</span>
+						</div>
+						<div class="user-item item-right">
+							<span>账号状态</span>
+							<span>正常</span>
+							<span>项目</span>
+							<span>项目名称</span>
+						</div>
+						
+					</div>
+					<div class="account-money">
+						<div class="user-item">
+							<div>
+								<span>冻结保证金</span>
+								<span>100.00</span>
+							</div>
+							<div>
+								<span>冻结手续费</span>
+								<span>100.00</span>
+							</div>
+							<div>
+								<span>手续费</span>
+								<span>10.00</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>入金</span>
+								<span>12000.00</span>
+							</div>
+							<div>
+								<span>出金</span>
+								<span>20000.00</span>
+							</div>
+							<div>
+								<span>汇率</span>
+								<span>1.1</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>初期资产</span>
+								<span>20000.00</span>
+							</div>
+							<div>
+								<span>占用保证金</span>
+								<span>250.00</span>
+							</div>
+							<div>
+								<span>可用保证金</span>
+								<span>1000</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>浮动盈亏</span>
+								<span>20000.00</span>
+							</div>
+							<div>
+								<span>平均盈亏</span>
+								<span>250.00</span>
+							</div>
+							<div>
+								<span></span>
+								<span></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="member-info">
+				<div class="head">
+					商品价格
+				</div>
+				<div class="goods">
+					<div class="title">
+						
+						<div class="name">商品</div>
+						<div class="price">最新价</div>
+						<div class="range">涨跌幅度</div>
+					</div>
+					<div class="goodsLists">
+						<div class="goods-item" v-for="(item,index) in goodsList">
+							<div class="name">{{item.name}}</div>
+							<div class="price">{{item.price}}</div>
+							<div class="range">{{item.range}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="right-Content">
+			<iframe src="../../.././static/text.html" class="charts"></iframe>
+			<el-collapse v-model="activeNames" @change="handleChange" accordion>
+			  <el-collapse-item title="在线交易" name="1">
+			    
+			  </el-collapse-item>
+			  <el-collapse-item title="我的订单" name="2">
+			    <div class="head">
+			    	委托订单
+			    </div>
+			    <div class="head">
+			    	持仓订单
+			    </div>
+			    <div class="head">
+			    	成交订单
+			    </div>
+			  </el-collapse-item>
+			 
+			</el-collapse>
+			
+		</div>
+	</div>
+	<footer>
+		
+	</footer>
+</div>

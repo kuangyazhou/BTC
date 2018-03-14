@@ -152,8 +152,8 @@ export default {
                   type: "success",
                   duration: 1500,
                   onClose: () => {
-                    this.$router.push("account");
-               
+                  //  this.$router.push("account");
+                   this.$router.push("index");
                   }
                 });
               }

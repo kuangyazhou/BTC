@@ -1,6 +1,11 @@
 import {
   login
 } from '@/api/login';
+import {
+  topAgent,
+  saveAgent
+} from '@/api/account';
+
 
 import {
   loadToken,
@@ -48,6 +53,24 @@ const user = {
         throw Error(err);
       })
       // })
+    },
+    addTopAgent({
+      commit
+    }, agentInfo) {
+      return topAgent(agentInfo).then(response => {
+        return response;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    saveAgent({
+      commit
+    }, info) {
+      return saveAgent(info).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
     }
   }
 }
