@@ -8,8 +8,13 @@ import store from '@/store';
 
 
 import {
-  currency
+  currency,
+  pen
 } from '@/utils/currency';
+
+import {
+  loadToken
+} from '@/utils/apiUtils';
 
 import '@/mock/index.js';
 
@@ -24,6 +29,28 @@ Vue.config.productionTip = false;
 
 // 货币格式化过滤器
 Vue.filter('currency', currency);
+Vue.filter('percentage', pen);
+
+router.beforeEach((to, from, next) => {
+  let token = loadToken();
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!token) {
+      // location.replace(`/login`)
+      next({
+        path: '/login',
+        query: {
+          redirect: to.fullPath
+        }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+  next();
+});
+
 
 /* eslint-disable no-new */
 new Vue({

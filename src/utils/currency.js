@@ -68,3 +68,7 @@ export function getNextMonth(date) {
   const t2 = year2 + '-' + month2 + '-' + day2;
   return t2;
 }
+
+export function pen(val) {
+  return val + '%';
+}

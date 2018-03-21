@@ -1,87 +1,92 @@
+
 <div class="index">
 	<header>
-		bitFinex
-		<el-button type="primary" class="user-button">充值</el-button>
-		<el-button type="primary" class="user-button">提现</el-button>
-		<el-button type="primary" class="user-button">订单</el-button>
+
+		<span class="tab">
+			<span class="login" @click="$router.push({'name':'userLogin'})">登陆/LOGIN</span>
+		<el-button type="primary" class="user-button">{{$t('l.cz')}}</el-button>
+		<el-button type="primary" class="user-button">{{$t('l.tx')}}</el-button>
+		<el-button type="primary" class="user-button">{{$t('l.dd')}}</el-button>
+		<el-button type="primary" class="lang-button" round medium @click="changeLn">{{$t('l.ln')}}</el-button>
+		</span>
 	</header>
 	<div class="body-content">
 		<div class="left-info">
 			<div class="loginBox">
-				<el-button type="primary" class="login-button">注册</el-button>
-				<el-button type="primary" class="login-button">登陆</el-button>
+				<el-button type="primary" class="login-button">{{$t('l.login')}}</el-button>
+				<el-button type="primary" class="login-button">{{$t('l.reg')}}</el-button>
 			</div>
 			<div class="member-info">
 				<div class="head">
-					会员资金
+					<span class="head-name">{{$t('l.hm')}}</span>
 				</div>
 				<div class="money-info">
 					<div class="user-info">
 						<div class="user-item item-left">
-							<span>会员账号</span>
+							<span class="top">{{$t('l.mm')}}</span>
 							<span>lidaming001</span>
-							<span>会员名称</span>
+							<span class="top">{{$t('l.mc')}}</span>
 							<span>李大明</span>
 						</div>
 						<div class="user-item item-right">
-							<span>账号状态</span>
+							<span class="top">{{$t('l.st')}}</span>
 							<span>正常</span>
-							<span>项目</span>
+							<span class="top">{{$t('l.project')}}</span>
 							<span>项目名称</span>
 						</div>
-						
+
 					</div>
 					<div class="account-money">
 						<div class="user-item">
 							<div>
 								<span>冻结保证金</span>
-								<span>100.00</span>
+								<span class="data">100.00</span>
 							</div>
 							<div>
 								<span>冻结手续费</span>
-								<span>100.00</span>
+								<span class="data">100.00</span>
 							</div>
 							<div>
 								<span>手续费</span>
-								<span>10.00</span>
+								<span class="data">10.00</span>
 							</div>
 						</div>
 						<div class="user-item">
 							<div>
 								<span>入金</span>
-								<span>12000.00</span>
+								<span class="data">12000.00</span>
 							</div>
 							<div>
 								<span>出金</span>
-								<span>20000.00</span>
+								<span class="data red">2000.00</span>
 							</div>
 							<div>
 								<span>汇率</span>
-								<span>1.1</span>
+								<span class="data red">1.1</span>
 							</div>
 						</div>
 						<div class="user-item">
 							<div>
 								<span>初期资产</span>
-								<span>20000.00</span>
+								<span class="data">20000.00</span>
 							</div>
 							<div>
 								<span>占用保证金</span>
-								<span>250.00</span>
+								<span class="data red">250.00</span>
 							</div>
 							<div>
 								<span>可用保证金</span>
-								<span>1000</span>
+								<span class="data">1000</span>
 							</div>
 						</div>
 						<div class="user-item">
 							<div>
 								<span>浮动盈亏</span>
-								<span>20000.00</span>
+								<span class="data">20000.00</span>
 							</div>
 							<div>
 								<span>平均盈亏</span>
-								<span>250.00</span>
+								<span class="data red">250.00</span>
 							</div>
 							<div>
 								<span></span>
@@ -93,14 +98,14 @@
 			</div>
 			<div class="member-info">
 				<div class="head">
-					商品价格
+					<span class="head-name">{{$t('l.spp')}}<img src="./img/price.png"/></span>
 				</div>
 				<div class="goods">
 					<div class="title">
-						
-						<div class="name">商品</div>
-						<div class="price">最新价</div>
-						<div class="range">涨跌幅度</div>
+
+						<div class="name">{{$t('l.sp')}}</div>
+						<div class="price">{{$t('l.np')}}</div>
+						<div class="range">{{$t('l.rg')}}</div>
 					</div>
 					<div class="goodsLists">
 						<div class="goods-item" v-for="(item,index) in goodsList">
@@ -113,28 +118,91 @@
 			</div>
 		</div>
 		<div class="right-Content">
-			<iframe src="../../.././static/text.html" class="charts"></iframe>
+		
+			<div class="charts">
+				<kl_echarts></kl_echarts>
+			</div>
 			<el-collapse v-model="activeNames" @change="handleChange" accordion>
-			  <el-collapse-item title="在线交易" name="1">
-			    
-			  </el-collapse-item>
-			  <el-collapse-item title="我的订单" name="2">
-			    <div class="head">
-			    	委托订单
-			    </div>
-			    <div class="head">
-			    	持仓订单
-			    </div>
-			    <div class="head">
-			    	成交订单
-			    </div>
-			  </el-collapse-item>
-			 
+				<el-collapse-item :title="$t('l.ol')" name="1">
+
+				</el-collapse-item>
+				<el-collapse-item :title="$t('l.mo')" name="2" class="title">
+					<div class="head">
+						委托订单
+					</div>
+					<el-table :data="tableData" style="width: 100%">
+						<el-table-column prop="date" label="日期" width="180">
+						</el-table-column>
+						<el-table-column prop="name" label="姓名" width="180">
+						</el-table-column>
+						<el-table-column prop="address" label="地址">
+						</el-table-column>
+					</el-table>
+					<div class="head">
+						持仓订单
+					</div>
+					<div class="head">
+						成交订单
+					</div>
+				</el-collapse-item>
+
 			</el-collapse>
-			
+
 		</div>
 	</div>
 	<footer>
-		
+		<div class="wrap-link">
+			<div class="link">
+				<div>安全可靠的交易平台</div>
+				<div class="en">
+					Finex Inc.
+				</div>
+				<div class="online-consult">
+					<div>
+						在线咨询
+					</div>
+					<div>
+						<a class='qq'>
+							<img src="./img/qq.png" />
+							<span>QQ交流群</span>
+						</a>
+						<a class='weixin'>
+							<img src="./img/weixin.png" />
+							<span>微信交流群</span>
+						</a>
+					</div>
+				</div>
+				<div class="list-notice">
+					<ul>
+						<li>公司简介</li>
+						<li>关于我们</li>
+						<li>加入我们</li>
+						<li>友情链接</li>
+					</ul>
+					<ul>
+						<li>费率与生命</li>
+						<li>费用说明</li>
+						<li>服务条款</li>
+						<li>法律声明</li>
+					</ul>
+					<ul>
+						<li>服务与帮助</li>
+						<li>新手帮助</li>
+						<li>充值指南</li>
+						<li>交易指南</li>
+					</ul>
+					<div class="risk-notice">
+						<div class="red-notice">市场有风险 投资需谨慎</div>
+						<div>比特币不由货币当局发行，不具法偿性与强制性,</div>
+						<div>具有极高的价格波动风险，请在风险自担的情况下谨慎投资.</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="copyright">
+			Copyright &copy;2013-2018 Finex Inc. All rights reserved.
+		</div>
 	</footer>
 </div>

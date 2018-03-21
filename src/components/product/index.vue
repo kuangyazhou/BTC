@@ -1,13 +1,13 @@
 <template>
   <div>
-    <Proxy title="二级"></Proxy>
+    <!-- <Proxy title="二级"></Proxy> -->
   </div>
 </template>
 
 <script>
-import Proxy from "@/components/common/proxy";
+// import Proxy from "@/components/common/proxy";
 export default {
-  components: { Proxy },
+  components: {},
   name: "Product",
   data() {
     return {

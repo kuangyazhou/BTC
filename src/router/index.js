@@ -11,8 +11,8 @@ const Register = resolve => require(['@/components/login/register'], resolve);
 
 const Home = resolve => require(['@/components/Home'], resolve);
 
-const Account = resolve => require(['@/components/account/index'], resolve);
- 
+const Account = resolve => require(['@/components/account/account'], resolve);
+
 const Arguments = resolve => require(['@/components/arguments/index'], resolve);
 
 const Money = resolve => require(['@/components/money/index'], resolve);
@@ -20,11 +20,11 @@ const Money = resolve => require(['@/components/money/index'], resolve);
 const Notice = resolve => require(['@/components/arguments/index'], resolve);
 
 const Product = resolve => require(['@/components/product/index'], resolve);
- 
+
 const Receive = resolve => require(['@/components/receive/index'], resolve);
- 
+
 const StateMent = resolve => require(['@/components/statement/index'], resolve);
-  
+
 
 const notFound = resolve => require(['@/components/404/index'], resolve);
 
@@ -38,8 +38,9 @@ export default new Router({
       component: userLogin
     }, {
       path: '/',
+      name: 'userLogin',
       component: userLogin
-    },{
+    }, {
       path: '/login',
       name: Login,
       component: Login
@@ -59,11 +60,17 @@ export default new Router({
       children: [{
           path: '/',
           component: Account,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/account',
           name: 'Account',
-          component: Account
+          component: Account,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/arguments',

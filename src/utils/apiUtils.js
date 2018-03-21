@@ -15,9 +15,18 @@ export function setUserInfo(user) {
   localStorage.setItem('user', JSON.stringify(user));
 }
 
+export function setLevel(info) {
+  sessionStorage.setItem('user_level', info.level);
+}
+
+export function getLevel() {
+  return sessionStorage.getItem('user_level');
+}
+
 export function getUserInfo() {
   return JSON.stringify(localStorage.getItem('user'));
 }
+
 // "proxy": {
 //     "/": {
 //       "target": "http://192.168.123.10",
