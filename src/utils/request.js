@@ -21,6 +21,7 @@ const service = axios.create({
   transformRequest: [
     function (data) {
       let ret = "";
+      let arr = [];
       for (let it in data) {
         ret +=
           encodeURIComponent(it) +
@@ -28,7 +29,7 @@ const service = axios.create({
           encodeURIComponent(data[it]) +
           "&";
       }
-      return ret;
+      return ret
     }
   ],
 })
@@ -48,6 +49,12 @@ service.interceptors.response.use(
   response => {
     let old = loadToken();
     requestPipe(response);
+    // response时验证token，返回token并且与本地不同时，存储
+    if (response.headers.authorization && (response.headers.authorization != old)) {
+      setToken(response.headers.authorization);
+      console.log(old, response.headers.authorization, '更新token');
+    }
+
     // 返回status为-1时,状态为退出,跳转至登录;
     if (response.data.status == -1) {
       console.log('身份已过期');
@@ -63,15 +70,11 @@ service.interceptors.response.use(
         }
       });
     }
-    // response时验证token，返回token并且与本地不同时，存储
-    if (response.headers.authorization && response.headers.authorization != old) {
-      setToken(response.headers.authorization);
-      console.log('更新token');
-    }
     return response;
   },
   err => {
     console.log(err);
+    Promise.reject(err);
   }
 )
 

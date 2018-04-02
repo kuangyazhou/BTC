@@ -1,6 +1,29 @@
 /**
  * Created by jacksoft on 17/4/26.
  */
+String.prototype.isNum = function (){
+    string = this.toString()
+    // isNaN()函数 把空串 空格 以及NUll 按照0来处理 所以先去除
+    if(string === "" || string ==null){
+        return false;
+    }
+    if(!isNaN(string)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+String.prototype.toInt = function (){
+    string = this.toString()
+    return parseInt(string);
+}
+
+String.prototype.toFloat = function (){
+    string = this.toString()
+    return parseFloat(string);
+}
+
 Date.prototype.Format = function (fmt) {
   let o = {
     "M+": this.getMonth() + 1, //月份

@@ -1,5 +1,7 @@
 import {
-  login
+  login,
+  userLogin,
+  userLogout
 } from '@/api/login';
 import {
   topAgent,
@@ -8,7 +10,14 @@ import {
   preList,
   editNext,
   saveNext,
-  initList
+  initList,
+  adminLisit,
+  addAdmin,
+  saveAdmin,
+  addMember,
+  accountOperate,
+  adminOperate,
+  editPwd
 } from '@/api/account';
 
 import {
@@ -27,18 +36,22 @@ import router from '@/router';
 
 const user = {
   state: {
+  	userInfo: null,
     userName: null,
     level: null,
     token: false
   },
   mutations: {
     SET_USER: (state, user) => {
+    	state.userInfo = user.data;
       state.userName = user.data.user_name;
       state.level = user.data.level;
       state.token = true;
     },
     LOGIN_OUT: (state) => {
       setToken('user_id_token', null);
+      state.userInfo = null;
+      state.token = false;
       window.localStorage.removeItem('user_id_token');
       window.localStorage.removeItem('user');
     }
@@ -55,6 +68,37 @@ const user = {
         // setToken(response.headers.authorization);
         commit('SET_USER', response.data);
         setUserInfo(response.data.data);
+        return response;
+        // resolve();
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    loginByaccount({
+      commit
+    }, userInfo) {
+      const account = userInfo.account;
+      const password = userInfo.password;
+      return userLogin(account, password).then(response => {
+        // 当res中带有token并且与本地token不同时，更新一次;
+        // setToken(response.headers.authorization);
+        commit('SET_USER', response.data);
+        setUserInfo(response.data.data);
+        return response;
+        // resolve();
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //会员退出
+    userlogout({
+      commit
+    }, userInfo) {
+      return userLogout().then(response => {
+        // 当res中带有token并且与本地token不同时，更新一次;
+        // setToken(response.headers.authorization);
+        commit('LOGIN_OUT');
+
         return response;
         // resolve();
       }).catch(err => {
@@ -128,6 +172,77 @@ const user = {
     }, data) {
       return saveNext(data).then(response => {
         return response;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+
+    //管理员列表adminLisit
+    adminListit({
+      commit
+    }, data) {
+      return adminLisit(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //新增修改管理员
+    addAdmin({
+      commit
+    }, data) {
+      return addAdmin(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //保存管理员
+    saveAdmin({
+      commit
+    }, data) {
+      return saveAdmin(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //注册会员
+    addMember({
+      commit
+    }, data) {
+      return addMember(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //帐号停用/启用/删除
+    accountOperate({
+      commit
+    }, data) {
+      return accountOperate(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //子管理员启用/停用/删除
+    adminOperate({
+      commit
+    }, data) {
+      return adminOperate(data).then(res => {
+        return res;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    //修改密码
+    editPwd({
+      commit
+    }, data) {
+      return editPwd(data).then(res => {
+        return res;
       }).catch(err => {
         throw Error(err);
       })

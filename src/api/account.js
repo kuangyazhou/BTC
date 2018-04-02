@@ -76,3 +76,67 @@ export function initList(data) {
     url: `/index.php?r=btc/user/index&level=${level}&page=${page}&parent_id=${parent_id}&keyword=${keyword}`
   })
 }
+
+//管理员列表
+export function adminLisit(data) {
+  return request({
+    method: 'get',
+    url: `/index.php?r=btc/admin/index`
+  })
+}
+
+//新增修改管理员
+export function addAdmin(data) {
+  const {
+    user_id = ''
+  } = data;
+  return request({
+    method: 'get',
+    url: `/index.php?r=btc/admin/edit&user_id=${user_id}`
+  })
+}
+
+//保存管理员
+export function saveAdmin(data) {
+  return request({
+    data,
+    method: 'post',
+    url: `/index.php?r=btc/admin/save`
+  })
+}
+
+//注册会员
+export function addMember(data) {
+  return request({
+    data,
+    method: 'post',
+    url: `/index.php?r=btc/member/register`
+  })
+}
+
+//帐号停用/启用/删除
+export function accountOperate(data) {
+  return request({
+    data,
+    method: 'post',
+    url: `/index.php?r=btc/user/status`
+  })
+}
+
+//子管理员启用/停用/删除
+export function adminOperate(data) {
+  return request({
+    data,
+    method: 'post',
+    url: `/index.php?r=btc/admin/status`
+  })
+}
+
+//修改密码
+export function editPwd(data) {
+  return request({
+    data,
+    method: 'post',
+    url: `/index.php?r=btc/user/edit-password`
+  })
+}

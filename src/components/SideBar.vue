@@ -54,7 +54,6 @@ export default {
   data() {
     return {
       msg: "account"
-      // activePane: this.$route.path.substring(1)
     };
   },
   computed: {

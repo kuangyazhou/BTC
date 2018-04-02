@@ -1,36 +1,14 @@
 <template>
   <div class="login">
-    <!-- <el-container>
-      <el-header>Header</el-header>
-    </el-container>
-    <el-container>
-      <el-footer>Footer</el-footer>
-    </el-container> -->
-    <el-row class="ln">
-      <el-col :span="5" :push="20">
-        <div class="flex">
-          <el-dropdown @command="changeLang">
-            <span class="el-dropdown-link">
-              {{$t('message.ln')}}
-              <i class="el-icon-arrow-down el-icon--right"></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="cn">{{$t('message.cn')}}</el-dropdown-item>
-              <el-dropdown-item command="en">{{$t('message.en')}}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </div>
-      </el-col>
-    </el-row>
     <el-row>
-      <el-col class="login-container" :span="6" :push="12">
-        <h3 class="">{{$t('message.login')}}</h3>
+      <el-col class="login-container" :span="6" :push="9">
+        <h3 class="">{{$t('message.login')}} BitFINEX</h3>
         <el-form ref="form" :rules="rules" :model="form" size="small">
-          <el-form-item label="" prop="userName">
-            <el-input prefix-icon="el-icon-search" v-model="form.userName" :placeholder="$t('message.account')" name="username"></el-input>
+          <el-form-item label="" prop="account">
+            <el-input prefix-icon="el-icon-search" v-model="form.account" :placeholder="$t('message.zh')" ></el-input>
           </el-form-item>
-          <el-form-item label="" prop="pwd">
-            <el-input prefix-icon="el-icon-search" type="password" @keyup.enter.native="onSubmit" v-model="form.pwd" :placeholder="$t('message.pwd')" name="pwd"></el-input>
+          <el-form-item label="" prop="password">
+            <el-input prefix-icon="el-icon-search" type="password" @keyup.enter.native="onSubmit" v-model="form.password" :placeholder="$t('message.pwd')" name="password"></el-input>
           </el-form-item>
           <el-form-item>
             <div class="flex row between">
@@ -110,18 +88,18 @@ export default {
       checked: true,
       form: {
         formError: null,
-        userName: "",
-        pwd: ""
+        account: "qew123463",
+        password: "123456"
       },
       rules: {
-        userName: [
+        account: [
           {
             required: true,
-            message: this.$t("message.emptyAccount"),
+            message: this.$t("message.emptyAccounts"),
             trigger: "blur"
           }
         ],
-        pwd: [
+        password: [
           {
             required: true,
             message: this.$t("message.emptyPwd"),
@@ -141,9 +119,9 @@ export default {
       const self = this;
       this.$refs["form"].validate(valid => {
         if (valid) {
-          // console.log(this.$store.state.userName, this.$store.state.level);
+          
           this.$store
-            .dispatch("loginByuserName", this.form)
+            .dispatch("loginByaccount", this.form)
             .then(e => {
               // e.data.status ? this.$router.push("home") : null;
               if (e.data.status) {
@@ -153,7 +131,7 @@ export default {
                   duration: 1500,
                   onClose: () => {
                   //  this.$router.push("account");
-                   this.$router.push("index");
+                   this.$router.push({'name':'Trade'});
                   }
                 });
               }
@@ -179,11 +157,11 @@ export default {
       localStorage.setItem("lang", e);
       this.$i18n.locale = e; //设置语言
       this.$refs["form"].clearValidate(); //清空form验证信息
-      this.rules.userName[0].message = this.$t("message.emptyAccount"); //重置rule 否则提醒信息不刷新 fuck!!!!
-      this.rules.pwd[0].message = this.$t("message.emptyPwd");
+      this.rules.account[0].message = this.$t("message.emptyAccounts"); //重置rule 否则提醒信息不刷新 fuck!!!!
+      this.rules.password[0].message = this.$t("message.emptyPwd");
     },
     reg() {
-      this.$router.push({ path: "reg" });
+      this.$router.push({ path: "userReg" });
     }
   }
 };
@@ -191,11 +169,12 @@ export default {
 
 <style scoped>
 .login {
-  height: 100%;
-  background: #00b38b;
+  height:700px;
+  background: url(./img/loginBg.jpg) center center no-repeat/cover;
 }
 .login-container {
-  background: #fff;
+  background: rgba(255,255,255,0.9);
+  margin-top: 150px;
   padding: 0 4%;
 }
 .login-err {

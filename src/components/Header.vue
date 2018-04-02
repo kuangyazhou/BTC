@@ -56,23 +56,25 @@ Vue.use(Dropdown);
 Vue.use(DropdownMenu);
 Vue.use(DropdownItem);
 
+import { getUserInfo } from "@/utils/apiUtils";
+
 export default {
   data() {
-    return {
-      msg: "This is the Header"
-    };
+    return {};
   },
   computed: {
     userName() {
-      return (
-        this.$store.state.user.userName ||
-        JSON.parse(localStorage.getItem("user")).user_name
-      );
+      // return (
+      //   this.$store.state.user.userName ||
+      //   JSON.parse(sessionStorage.getItem("user")).user_name
+      // );
+      return this.$store.state.user.userName || getUserInfo().user_name;
     }
   },
-  mounted() {
+  created() {
     // console.log(getUserInfo());
   },
+  mounted() {},
   methods: {
     operate(e) {
       if (e == "logout") {

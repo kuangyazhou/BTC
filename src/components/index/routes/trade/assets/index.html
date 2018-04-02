@@ -1,0 +1,331 @@
+
+	<div class="trade">
+		<div class="left-info">
+			<div class="loginBox" v-if="!userInfo">
+				<el-button type="primary" class="login-button" @click="$router.push({'path':'/userlogin'})">{{$t('l.login')}}</el-button>
+				<el-button type="primary" class="login-button" @click="$router.push({'path':'/userReg'})">{{$t('l.reg')}}</el-button>
+			</div>
+			<div class="member-info" v-if="userInfo">
+				<div class="head">
+					<span class="head-name">{{$t('l.hm')}}</span><img src="./img/member.png"/>
+				</div>
+				<div class="money-info" >
+					<div class="user-info">
+						<div class="user-item item-left">
+							<span class="top">{{$t('l.hyzh')}}</span>
+							<span>{{userInfo.account}}</span>
+							<span class="top">{{$t('l.hymc')}}</span>
+							<span>{{userInfo.user_name}}</span>
+						</div>
+						<div class="user-item item-right">
+							<span class="top">{{$t('l.st')}}</span>
+							<span>{{$t('l.status')[userInfo.status]}}</span>
+							<span class="top">{{$t('l.project')}}</span>
+							<span>BTC</span>
+						</div>
+
+					</div>
+					<div class="account-money">
+						<div class="user-item">
+							<div>
+								<span>{{$t('l.djbzj')}}</span>
+								<span class="data">{{userInfo.frozen_deposit_amount}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.djsxf')}}</span>
+								<span class="data">{{userInfo.frozen_service_fee}}</span>
+							</div>
+							<div>
+								<span>{{$t('ar.sxf')}}</span>
+								<span class="data">{{userInfo.service_fee}}</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>{{$t('l.rj')}}</span>
+								<span class="data blue">{{userInfo.pay_money}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.cj')}}</span>
+								<span class="data red">{{userInfo.withdraw_money}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.hl')}}</span>
+								<span class="data red">{{userInfo.exchange_rate}}</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>{{$t('l.cqzc')}}</span>
+								<span class="data">{{userInfo.start_balance}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.zybzj')}}</span>
+								<span class="data red">{{userInfo.used_deposit_amount}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.kybzj')}}</span>
+								<span class="data">{{userInfo.avail_deposit_amount}}</span>
+							</div>
+						</div>
+						<div class="user-item">
+							<div>
+								<span>{{$t('l.fdyk')}}</span>
+								<span class="data">{{userInfo.float_win_loss}}</span>
+							</div>
+							<div>
+								<span>{{$t('l.pcyk')}}</span>
+								<span class="data red">{{userInfo.close_win_loss}}</span>
+							</div>
+							<div>
+								<span></span>
+								<span></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="member-info">
+				<div class="head">
+					<span class="head-name">{{$t('l.spp')}}</span><img class="priceImg" src="./img/price.png"/>
+				</div>
+				<div class="goods">
+					<div class="title">
+
+						<div class="name">{{$t('l.sp')}}</div>
+						<div class="price">{{$t('l.np')}}</div>
+						<div class="range">{{$t('l.rg')}}</div>
+					</div>
+					<div class="goodsLists">
+						<div class="goods-item" v-for="(item,index) in goodsList">
+							<div class="name">{{item.name}}</div>
+							<div class="price">{{(item.price).toFixed(5)}}</div>
+							<div class="range">{{item.range+'%'}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="right-Content">
+
+			<div class="charts">
+				<kl_echarts @setInitialPrice="getPrice"></kl_echarts>
+			</div>
+			<el-collapse v-model="activeNames" @change="handleChange" accordion class="tabList">
+				<el-collapse-item  name="1">
+					  <template slot="title">
+					      <span  class="title">{{$t('l.ol')}}</span> <img class="head-icon" src="./img/online.png"/>
+                      </template>
+					<div class="mod_hd">
+						<span :class="{'cur':cur==0}" @click="cur=0">{{$t('l.xjjy')}}</span>
+						<span :class="{'cur':cur==1}" @click="cur=1">{{$t('l.scjy')}}</span>
+					</div>
+					<div class="mod_bd">
+						<div class="panel">
+							<div class="hd">
+								<span>{{$t('l.ky')}}</span>
+								<span class="buy_available">0.00000000</span>
+								<span>USDT</span>
+								<a @click="$router.push({'path':'/userCenter'})">{{$t('l.cb')}}</a>
+							</div>
+							<div class="bd">
+								<div class="input-text input-price" v-if="cur==0">
+									<div class="label">{{$t('l.mrj')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="buyPrice"/>
+                     					<span>USDT</span>
+                     				</label>
+									<div class="math-price">
+										≈ {{buyPrice*0.63||0.00000}} CNY
+									</div>
+								</div>
+								<div class="input-text  input-price" v-if="cur==1">
+									<div class="label">{{$t('l.mrj')}}</div>
+									<label>
+                     					<input type="text" disabled="disabled" :placeholder="$t('l.ysczyjgmr')"/>
+                     					<span>USDT</span>
+                     				</label>
+
+								</div>
+								<div class="input-text" v-if="cur==0">
+									<div class="label">{{$t('l.mrl')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="buyNum"/>
+                     					<span>BTC</span>
+                     				</label>
+
+								</div>
+								<div class="input-text" v-if="cur==1">
+									<div class="label">{{$t('l.jye')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="sellNum"/>
+                     					<span>USDT</span>
+                     				</label>
+
+								</div>
+							
+								
+								<div class="account-range">
+									<span class="min">{{$t('ar.sxf')}} 0 USDT</span>
+									<!--<span class="max">0.0000 USDT</span>-->
+									<div class="total" v-if="cur==0">
+										{{$t('l.jye')}}   {{buyPrice*buyNum}} USDT
+									</div>
+								</div>
+								<div class="submit btn_buy">
+									{{$t('l.mr')}}BTC
+								</div>
+							</div>
+						</div>
+						<div class="panel">
+							<div class="hd">
+								<!--<span>{{$t('l.ky')}}</span>
+								<span class="buy_available">0.00000000</span>
+								<span>ETH</span>
+								<a href="#">{{$t('l.cb')}}</a>-->
+							</div>
+							<div class="bd">
+								<div class="input-text input-price" v-if="cur==0">
+									<div class="label">{{$t('l.mcj')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="sellPrice"/>
+                     					<span>USDT</span>
+                     				</label>
+									<div class="math-price">
+										≈ {{sellPrice*0.63||0.00000}} CNY
+									</div>
+								</div>
+								<div class="input-text  input-price" v-if="cur==1">
+									<div class="label">{{$t('l.mcj')}}</div>
+									<label>
+                     					<input type="text" disabled="disabled" :placeholder="$t('l.ysczyjgmc')"/>
+                     					<span>USDT</span>
+                     				</label>
+
+								</div>
+								<div class="input-text">
+									<div class="label">{{$t('l.mcl')}}</div>
+									<label>
+										<input type="text" maxlength="14" v-model="sellNum" v-if="cur==0"/>
+                     					<input type="text" maxlength="14" v-model="sellNums" v-if="cur==1"/>
+                     					<span>BTC</span>
+                     				</label>
+
+								</div>
+
+								<div class="account-range">
+									<span class="min">{{$t('ar.sxf')}} 0 USDT</span>
+									<!--<span class="max">0.0000 USDT</span>-->
+									<div class="total" v-if="cur==0">
+										{{$t('l.jye')}}   {{sellPrice*sellNum}} USDT
+									</div>
+								</div>
+								<div class="submit btn_sell">
+									{{$t('l.mc')}}BTC
+								</div>
+							</div>
+						</div>
+					</div>
+				</el-collapse-item>
+				<el-collapse-item  name="2" >
+					<template slot="title">
+					      <span  class="title">{{$t('l.mo')}}</span> <img class="head-icon" src="./img/order.png"/>
+                     </template>
+					<div class="head">
+						{{$t('l.wtdd')}}
+					</div>
+					<el-table :data="entrustOrder" style="width: 100%">
+						<el-table-column prop="date" :label="$t('l.wtdddh')" >
+						</el-table-column>
+						<el-table-column prop="name" :label="$t('l.wtsj')" >
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.spmc')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jcpc')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.wtsl')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.wtj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.zsj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.zyj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.hysxf')">
+						</el-table-column>
+					</el-table>
+					<div class="head">
+						
+						{{$t('l.ccdd')}}
+					</div>
+					<el-table :data="entrustOrder" style="width: 100%">
+						<el-table-column prop="date" :label="$t('l.ccdh')" >
+						</el-table-column>
+						<el-table-column prop="name" :label="$t('l.ccsj')" >
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.spmc')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.mmfx')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.ccsl')">
+						</el-table-column>
+
+						<el-table-column prop="address" :label="$t('l.zsj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.zyj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jcj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.ccj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jsj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jsyk')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.zybzj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jcsj')">
+						</el-table-column>
+					</el-table>
+					<div class="head">
+						{{$t('l.cjdd')}}
+					</div>
+					<el-table :data="entrustOrder" style="width: 100%">
+						<el-table-column prop="date" :label="$t('l.jcsj')" >
+						</el-table-column>
+						<el-table-column prop="name" :label="$t('l.ccdh')"  >
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.cjsj')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.spmc')" width="60"> 
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jcpc')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.mmfx')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.cjl')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.cjje')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.jcj')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.ccj')" width="60">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.pcj')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.sjyk')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.hysxf')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.gysxf')">
+						</el-table-column>
+						<el-table-column prop="address" :label="$t('l.cjlx')">
+						</el-table-column>
+					</el-table>
+				</el-collapse-item>
+
+			</el-collapse>
+
+		</div>
+	</div>
+	
