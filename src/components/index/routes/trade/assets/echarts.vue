@@ -364,11 +364,8 @@
 
 						var arrn = data.kLine[0];
 						//设置分时图显示
-						if(that.dayPrice[0][2]==0){
-                        	that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
-                        	that.$emit('setInitialPrice',that.dayPrice[0][2]);
-                        }
 						that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
+						that.$emit('setInitialPrice',that.dayPrice[0][2]);
 						that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
                         //document.title = (that.dayPrice[0][2]).toFixed(3)+' BTC 交易系统'                       	
 						//console.log( data.kLine[0]);

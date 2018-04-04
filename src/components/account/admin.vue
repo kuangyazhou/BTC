@@ -13,14 +13,14 @@
               <el-input v-model="adminForm.name" name="user_name"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <el-form-item label="帐号状态" prop="status">
               <el-select size="mini" v-model="adminForm.status">
                 <el-option v-for="item in status" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="8">
@@ -52,11 +52,11 @@
     <el-dialog title="基本信息修改" :visible="openItem=='update'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
       <el-form ref="adminForm" :model="adminForm" label-width="80px" :inline="true" size="mini" :rules="rules" label-position="right">
         <el-row>
-          <el-col :span="8">
+          <!-- <el-col :span="8">
             <el-form-item label="登录帐号" prop="account">
               <el-input v-model="adminForm.account" name="account" :disabled="true"></el-input>
             </el-form-item>
-          </el-col>
+          </el-col> -->
           <el-col :span="8">
             <el-form-item label="帐号名称" prop="name">
               <el-input v-model="adminForm.name" name="user_name"></el-input>
@@ -242,7 +242,7 @@ export default {
     addSubmit() {
       // console.log(this.adminForm);
       const arg = {
-        user_id: this.adminItem.id,
+        user_id: this.adminItem.id || "",
         account: this.adminForm.account || this.adminItem.account,
         name: this.adminForm.name,
         password: this.adminForm.password,

@@ -8,7 +8,7 @@
 			<span class="tab" >
 				<el-button type="primary" class="user-button" @click.stop="$router.push({'path':'/userlogin'})" v-if="!loginStatus">登录/LOGIN</el-button>
 				<el-button type="primary" class="user-button" @click.stop="logout" v-if="loginStatus">退出/LOGOUT</el-button>
-				<el-button type="primary" class="user-button">{{$t('l.cz')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/userCenter'})">{{$t('l.cz')}}</el-button>
 				<el-button type="primary" class="user-button">{{$t('l.tx')}}</el-button>
 				<el-button type="primary" class="user-button">{{$t('l.dd')}}</el-button>
 				<el-dropdown @command="changeLn">
@@ -26,7 +26,7 @@
 			</span>
 		</header>
 		<div class="body-content">
-			<router-view></router-view>
+			<router-view ></router-view>
 		</div>
 		<footer>
 			<div class="wrap-link">
@@ -125,7 +125,8 @@
 		},
 		methods: {
 			logout(){
-				   this.$store.dispatch("userlogout")
+				   this.$store.dispatch("userlogout");
+		
                              
 			},
 			changeLn(command) {

@@ -36,14 +36,14 @@ import router from '@/router';
 
 const user = {
   state: {
-  	userInfo: null,
+    userInfo: null,
     userName: null,
     level: null,
     token: false
   },
   mutations: {
     SET_USER: (state, user) => {
-    	state.userInfo = user.data;
+      state.userInfo = user.data;
       state.userName = user.data.user_name;
       state.level = user.data.level;
       state.token = true;
@@ -52,8 +52,8 @@ const user = {
       setToken('user_id_token', null);
       state.userInfo = null;
       state.token = false;
-      window.localStorage.removeItem('user_id_token');
-      window.localStorage.removeItem('user');
+      sessionStorage.removeItem('user_id_token');
+      sessionStorage.removeItem('user');
     }
   },
   actions: {
@@ -98,7 +98,6 @@ const user = {
         // 当res中带有token并且与本地token不同时，更新一次;
         // setToken(response.headers.authorization);
         commit('LOGIN_OUT');
-
         return response;
         // resolve();
       }).catch(err => {

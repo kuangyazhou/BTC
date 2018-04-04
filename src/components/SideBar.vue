@@ -64,6 +64,7 @@ export default {
   methods: {
     menuSelect(i) {
       // console.log(this.$route.path);
+      // console.log(this.$route.path);
       // window.location.href = `/${i}`;
       // this.$router.push(i);
       // this.$emit("routerChange", i);

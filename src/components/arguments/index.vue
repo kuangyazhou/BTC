@@ -414,7 +414,7 @@
 			</el-tab-pane>
 		</el-tabs>
 		<!-- 各个设置的弹窗部份 -->
-		<el-dialog :title="dialogTitle" :visible.sync="dialogPriceVisible" :width="dialogWidth" close-on-click-modal="true" top="0">
+		<el-dialog :title="dialogTitle" :visible.sync="dialogPriceVisible" :width="dialogWidth" :close-on-click-modal="true" top="0">
 			<el-form ref="dialogData" :model="dialogData" label-width="180px">
 				<!-- 价格熔断部份 -->
 				<div v-if="dialogType=='first'">
@@ -671,402 +671,463 @@
 				</div>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-                    <el-button @click="dialogPriceVisible = false">{{$t('ar.qx')}}</el-button>
-                    <el-button type="primary" @click="dialogSave" :loading="dialogLoading">{{$t('ar.qr')}}</el-button>
-            </span>
+				<el-button @click="dialogPriceVisible = false">{{$t('ar.qx')}}</el-button>
+				<el-button type="primary" @click="dialogSave" :loading="dialogLoading">{{$t('ar.qr')}}</el-button>
+			</span>
 		</el-dialog>
 	</div>
 </template>
 <script>
-	import Vue from "vue";
-	import request from "@/utils/request";
-	import {
-		getUserInfo
-	} from "@/utils/apiUtils";
-	import {
-		Tabs,
-		TabPane,
-		Button,
-		Row,
-		Col,
-		Input,
-		Table,
-		TableColumn,
-		Dialog,
-		Form,
-		FormItem,
-		InputNumber,
-		Select,
-		Option,
-		Message,
-		Card
-	} from "element-ui";
+import Vue from "vue";
+import request from "@/utils/request";
+import { getUserInfo } from "@/utils/apiUtils";
+import {
+  Tabs,
+  TabPane,
+  Button,
+  Row,
+  Col,
+  Input,
+  Table,
+  TableColumn,
+  Dialog,
+  Form,
+  FormItem,
+  InputNumber,
+  Select,
+  Option,
+  Message,
+  Card
+} from "element-ui";
 
-	Vue.use(Button);
-	Vue.use(Input);
-	Vue.use(Row);
-	Vue.use(Col);
-	Vue.use(Table);
-	Vue.use(TableColumn);
-	Vue.use(Dialog);
-	Vue.use(Form);
-	Vue.use(FormItem);
-	Vue.use(Tabs);
-	Vue.use(TabPane);
-	Vue.use(InputNumber);
-	Vue.use(Select);
-	Vue.use(Option);
-	Vue.use(Card);
-	export default {
-		data() {
-			return {
-				userInfo: {},
-				activeName: "first",
-				tableBlownData: [],
-				tableDepositData: [],
-				tableTradingPermissionsData: [],
-				tableServiceFeeData: [],
-				tableOvernightFeeData: [],
-				tableorderLimitData: [],
-				riskData: {},
-				tableorderDiffData: [],
-				tableReviewData: [],
-				tableExchangeRateData: [],
-				tableOrderTotalData: [],
-				dialogPriceVisible: false,
-				dialogTitle: "",
-				dialogData: {},
-				dialogWidth: "400px",
-				dialogType: "",
-				dialogLoading: false,
-				priceSteps: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-				privilegesOption: [{
-					k: 0,
-					v: this.$t('ar.wu')
-				}, {
-					k: 1,
-					v: this.$t('ar.you')
-				}],
-				overnightOption: [{
-					k: 0,
-					v: this.$t('ar.ac')
-				}, {
-					k: 1,
-					v: this.$t('ar.ar')
-				}],
-				form: []
-			};
-		},
-		mounted() {
-			this.userInfo = getUserInfo();
-			if(this.userInfo.level == 0) {
-				this.getData("first");
-				this.activeName = "first";
-			} else {
-				this.getData("seven");
-				this.activeName = "seven";
-			}
+Vue.use(Button);
+Vue.use(Input);
+Vue.use(Row);
+Vue.use(Col);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(Dialog);
+Vue.use(Form);
+Vue.use(FormItem);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(InputNumber);
+Vue.use(Select);
+Vue.use(Option);
+Vue.use(Card);
+export default {
+  data() {
+    return {
+      userInfo: {},
+      activeName: "first",
+      tableBlownData: [],
+      tableDepositData: [],
+      tableTradingPermissionsData: [],
+      tableServiceFeeData: [],
+      tableOvernightFeeData: [],
+      tableorderLimitData: [],
+      riskData: {},
+      tableorderDiffData: [],
+      tableReviewData: [],
+      tableExchangeRateData: [],
+      tableOrderTotalData: [],
+      dialogPriceVisible: false,
+      dialogTitle: "",
+      dialogData: {},
+      dialogWidth: "400px",
+      dialogType: "",
+      dialogLoading: false,
+      priceSteps: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      privilegesOption: [
+        {
+          k: 0,
+          v: this.$t("ar.wu")
+        },
+        {
+          k: 1,
+          v: this.$t("ar.you")
+        }
+      ],
+      overnightOption: [
+        {
+          k: 0,
+          v: this.$t("ar.ac")
+        },
+        {
+          k: 1,
+          v: this.$t("ar.ar")
+        }
+      ],
+      form: {}
+    };
+  },
+  mounted() {
+    this.userInfo = getUserInfo();
+    if (this.userInfo.level == 0) {
+      this.getData("first");
+      this.activeName = "first";
+    } else {
+      this.getData("seven");
+      this.activeName = "seven";
+    }
+  },
+  methods: {
+    handleClick(tab, event) {
+      this.getData(tab.$options.propsData.name);
+      console.log(tab, event);
+    },
+    getData(tab) {
+      var url;
+      let that = this;
+      switch (tab) {
+        case "first":
+          url = "/index.php?r=btc/config/price-blown";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableBlownData = res.data.data;
+          });
+          break;
+        case "second":
+          url = "/index.php?r=btc/config/trade-permission";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableTradingPermissionsData = res.data.data;
+          });
+          break;
+        case "third":
+          url = "/index.php?r=btc/config/deposit";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableDepositData = res.data.data;
+          });
+          break;
+        case "fourth":
+          url = "/index.php?r=btc/config/service-fee";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableServiceFeeData = res.data.data;
+          });
+          break;
+        case "five":
+          url = "/index.php?r=btc/config/overnight-fee";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableOvernightFeeData = res.data.data;
+          });
+          break;
+        case "six":
+          url = "/index.php?r=btc/config/order-limit";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableorderLimitData = res.data.data;
+          });
+          break;
+        case "seven":
+          url = "/index.php?r=btc/config/risk";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.form = res.data.data;
+          });
+          break;
+        case "eight":
+          url = "/index.php?r=btc/config/order-diff";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableorderDiffData = res.data.data;
+          });
+          break;
+        case "night":
+          url = "/index.php?r=btc/config/review";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableReviewData = res.data.data;
+          });
+          break;
+        case "ten":
+          url = "/index.php?r=btc/config/exchange-rate";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableExchangeRateData = res.data.data;
+          });
+          break;
+        case "eleven":
+          url = "/index.php?r=btc/config/user-order-total";
+          request({
+            method: "get",
+            url: url
+          }).then(res => {
+            that.tableOrderTotalData = res.data.data;
+          });
+          break;
+      }
+    },
+    onRiskSubmit(row, type) {
+      this.dialogData = row;
+      this.dialogType = type;
+      this.dialogSave();
+    },
+    handleEdit(index, row, type) {
+      this.dialogPriceVisible = true;
+      this.dialogData = row;
+      this.dialogWidth = "500px";
+      this.dialogType = type;
+      switch (type) {
+        case "first":
+          this.dialogTitle = this.$t("ar.jgrdsz");
+          break;
+        case "second":
+          this.dialogTitle = this.$t("ar.jyqxsz");
+          break;
+        case "third":
+          this.dialogTitle = this.$t("ar.bzjsz");
+          break;
+        case "fourth":
+          this.dialogTitle = this.$t("ar.sxfsz");
+          break;
+        case "five":
+          this.dialogTitle = this.$t("ar.gyfsz");
+          break;
+        case "six":
+          this.dialogTitle = this.$t("ar.cclsz");
+          break;
+        case "eight":
+          this.dialogTitle = this.$t("ar.dcsz");
+          break;
+        case "night":
+          this.dialogTitle = this.$t("ar.shsz");
+          break;
+        case "ten":
+          this.dialogTitle = this.$t("ar.hlsz");
+          break;
+        case "eleven":
+          this.dialogTitle = this.$t("ar.zdchlsz");
+          break;
+      }
+    },
+    dialogSave() {
+      var url;
+      let that = this;
+      let errMsg = "";
+      this.dialogLoading = true;
+      switch (this.dialogType) {
+        case "first":
+          url = "/index.php?r=btc/config/price-blown-save";
+          break;
+        case "second":
+          url = "/index.php?r=btc/config/trade-permission-save";
+          break;
+        case "third":
+          url = "/index.php?r=btc/config/deposit-save";
+          break;
+        case "fourth":
+          url = "/index.php?r=btc/config/service-fee-save";
+          if (
+            this.dialogData.single_open_percentage.isNum() == false ||
+            this.dialogData.single_open_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg1");
+          } else if (
+            this.dialogData.single_open_limit_percentage.isNum() == false ||
+            this.dialogData.single_open_limit_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg2");
+          } else if (
+            this.dialogData.single_close_percentage.isNum() == false ||
+            this.dialogData.single_close_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg3");
+          } else if (
+            this.dialogData.single_close_limit_percentage.isNum() == false ||
+            this.dialogData.single_close_limit_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg4");
+          } else if (
+            this.dialogData.single_open_limit_percentage.toFloat() <
+            this.dialogData.single_open_percentage.toFloat()
+          ) {
+            errMsg = this.$t("ar.errMsg5");
+          } else if (
+            this.dialogData.single_close_limit_percentage.toFloat() <
+            this.dialogData.single_close_percentage.toFloat()
+          ) {
+            errMsg = this.$t("ar.errMsg6");
+          }
+          break;
+        case "five":
+          url = "/index.php?r=btc/config/overnight-fee-save";
+          if (
+            this.dialogData.buy_percentage.isNum() == false ||
+            this.dialogData.buy_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg7");
+          }
+          if (
+            this.dialogData.sale_percentage.isNum() == false ||
+            this.dialogData.sale_percentage.toFloat() < 0
+          ) {
+            errMsg = this.$t("ar.errMsg8");
+          }
+          break;
+        case "six":
+          url = "/index.php?r=btc/config/order-limit-save";
+          if (this.dialogData.single_min_transaction.isNum() === false) {
+            errMsg = this.$t("ar.errMsg9");
+          } else if (this.dialogData.single_max_transaction.isNum() === false) {
+            errMsg = this.$t("ar.errMsg10");
+          } else if (
+            parseFloat(this.dialogData.single_min_transaction) >
+            parseFloat(this.dialogData.single_max_transaction)
+          ) {
+            errMsg = this.$t("ar.errMsg11");
+          } else if (this.dialogData.max_buy_limit.isNum() === false) {
+            errMsg = this.$t("ar.errMsg12");
+          } else if (this.dialogData.max_sale_limit.isNum() === false) {
+            errMsg = this.$t("ar.errMsg13");
+          } else if (this.dialogData.max_net_limit.isNum() === false) {
+            errMsg = this.$t("ar.errMsg14");
+          }
+          break;
+        case "seven":
+          url = "/index.php?r=btc/config/risk-save";
+          if (
+            this.dialogData.xy_call_margin_warn_percentage.isNum() === false ||
+            this.dialogData.xy_call_margin_warn_percentage.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg15");
+          }
+          if (
+            this.dialogData.xy_cut_margin_warn_percentage.isNum() === false ||
+            this.dialogData.xy_cut_margin_warn_percentage.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg16");
+          }
+          if (
+            this.dialogData.xj_call_margin_warn_percentage.isNum() === false ||
+            this.dialogData.xj_call_margin_warn_percentage.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg17");
+          }
+          if (
+            this.dialogData.xj_cut_margin_warn_percentage.isNum() === false ||
+            this.dialogData.xj_cut_margin_warn_percentage.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg18");
+          }
+          if (
+            this.dialogData.max_win_percentage.isNum() === false ||
+            this.dialogData.max_win_percentage.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg19");
+          }
+          break;
+        case "eight":
+          url = "/index.php?r=btc/config/order-diff-save";
+          if (
+            this.dialogData.order_diff.isNum() === false ||
+            this.dialogData.order_diff.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg20");
+          }
+          break;
+        case "night":
+          debugger;
+          url = "/index.php?r=btc/config/review-save";
+          if (
+            this.dialogData.small_limit.isNum() === false ||
+            this.dialogData.small_limit.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg21");
+          } else if (
+            this.dialogData.big_limit.isNum() === false ||
+            this.dialogData.big_limit.toInt() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg22");
+          } else if (
+            this.dialogData.small_limit.toInt() >=
+            this.dialogData.big_limit.toInt()
+          ) {
+            errMsg = this.$t("ar.errMsg23");
+          }
+          break;
+        case "ten":
+          url = "/index.php?r=btc/config/exchange-rate-save";
+          if (
+            this.dialogData.exchange_rate.isNum() === false ||
+            this.dialogData.exchange_rate.toFloat() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg24");
+          }
+          break;
+        case "eleven":
+          url = "/index.php?r=btc/config/user-order-total-save";
+          if (
+            this.dialogData.item_number.isNum() === false ||
+            this.dialogData.item_number.toFloat() <= 0
+          ) {
+            errMsg = this.$t("ar.errMsg25");
+          }
+          break;
+      }
 
-		},
-		methods: {
-			handleClick(tab, event) {
-				this.getData(tab.$options.propsData.name);
-				console.log(tab, event);
-			},
-			getData(tab) {
-				var url;
-				let that = this;
-				switch(tab) {
-					case "first":
-						url = "/index.php?r=btc/config/price-blown";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableBlownData = res.data.data;
-						});
-						break;
-					case "second":
-						url = "/index.php?r=btc/config/trade-permission";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableTradingPermissionsData = res.data.data;
-						});
-						break;
-					case "third":
-						url = "/index.php?r=btc/config/deposit";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableDepositData = res.data.data;
-						});
-						break;
-					case "fourth":
-						url = "/index.php?r=btc/config/service-fee";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableServiceFeeData = res.data.data;
-						});
-						break;
-					case "five":
-						url = "/index.php?r=btc/config/overnight-fee";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableOvernightFeeData = res.data.data;
-						});
-						break;
-					case "six":
-						url = "/index.php?r=btc/config/order-limit";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableorderLimitData = res.data.data;
-						});
-						break;
-					case "seven":
-						url = "/index.php?r=btc/config/risk";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.form = res.data.data;
-						});
-						break;
-					case "eight":
-						url = "/index.php?r=btc/config/order-diff";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableorderDiffData = res.data.data;
-						});
-						break;
-					case "night":
-						url = "/index.php?r=btc/config/review";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableReviewData = res.data.data;
-						});
-						break;
-					case "ten":
-						url = "/index.php?r=btc/config/exchange-rate";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableExchangeRateData = res.data.data;
-						});
-						break;
-					case "eleven":
-						url = "/index.php?r=btc/config/user-order-total";
-						request({
-							method: "get",
-							url: url
-						}).then(res => {
-							that.tableOrderTotalData = res.data.data;
-						});
-						break;
-				}
-			},
-			onRiskSubmit(row, type) {
-				this.dialogData = row;
-				this.dialogType = type;
-				this.dialogSave();
-			},
-			handleEdit(index, row, type) {
-				this.dialogPriceVisible = true;
-				this.dialogData = row;
-				this.dialogWidth = "500px";
-				this.dialogType = type;
-				switch(type) {
-					case "first":
-						this.dialogTitle = this.$t('ar.jgrdsz');
-						break;
-					case "second":
-						this.dialogTitle = this.$t('ar.jyqxsz');
-						break;
-					case "third":
-						this.dialogTitle = this.$t('ar.bzjsz');
-						break;
-					case "fourth":
-						this.dialogTitle = this.$t('ar.sxfsz');
-						break;
-					case "five":
-						this.dialogTitle = this.$t('ar.gyfsz');
-						break;
-					case "six":
-						this.dialogTitle = this.$t('ar.cclsz');
-						break;
-					case "eight":
-						this.dialogTitle = this.$t('ar.dcsz');
-						break;
-					case "night":
-						this.dialogTitle = this.$t('ar.shsz');
-						break;
-					case "ten":
-						this.dialogTitle = this.$t('ar.hlsz');
-						break;
-					case "eleven":
-						this.dialogTitle = this.$t('ar.zdchlsz');
-						break;
-				}
-
-			},
-			dialogSave() {
-				var url;
-				let that = this;
-				let errMsg = "";
-				this.dialogLoading = true;
-				switch(this.dialogType) {
-					case "first":
-						url = "/index.php?r=btc/config/price-blown-save";
-						break;
-					case "second":
-						url = "/index.php?r=btc/config/trade-permission-save";
-						break;
-					case "third":
-						url = "/index.php?r=btc/config/deposit-save";
-						break;
-					case "fourth":
-						url = "/index.php?r=btc/config/service-fee-save";
-						if(this.dialogData.single_open_percentage.isNum() == false || this.dialogData.single_open_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg1') ;
-						} else if(this.dialogData.single_open_limit_percentage.isNum() == false || this.dialogData.single_open_limit_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg2');
-						} else if(this.dialogData.single_close_percentage.isNum() == false || this.dialogData.single_close_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg3');
-						} else if(this.dialogData.single_close_limit_percentage.isNum() == false || this.dialogData.single_close_limit_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg4');
-						} else if(this.dialogData.single_open_limit_percentage.toFloat() < this.dialogData.single_open_percentage.toFloat()) {
-							errMsg = this.$t('ar.errMsg5');
-						} else if(this.dialogData.single_close_limit_percentage.toFloat() < this.dialogData.single_close_percentage.toFloat()) {
-							errMsg = this.$t('ar.errMsg6');
-						}
-						break;
-					case "five":
-						url = "/index.php?r=btc/config/overnight-fee-save";
-						if(this.dialogData.buy_percentage.isNum() == false || this.dialogData.buy_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg7');
-						}
-						if(this.dialogData.sale_percentage.isNum() == false || this.dialogData.sale_percentage.toFloat() < 0) {
-							errMsg = this.$t('ar.errMsg8');
-						}
-						break;
-					case "six":
-						url = "/index.php?r=btc/config/order-limit-save";
-						if(this.dialogData.single_min_transaction.isNum() === false) {
-							errMsg = this.$t('ar.errMsg9');
-						} else if(this.dialogData.single_max_transaction.isNum() === false) {
-							errMsg = this.$t('ar.errMsg10');
-						} else if(parseFloat(this.dialogData.single_min_transaction) > parseFloat(this.dialogData.single_max_transaction)) {
-							errMsg = this.$t('ar.errMsg11');
-						} else if(this.dialogData.max_buy_limit.isNum() === false) {
-							errMsg = this.$t('ar.errMsg12');
-						} else if(this.dialogData.max_sale_limit.isNum() === false) {
-							errMsg = this.$t('ar.errMsg13');
-						} else if(this.dialogData.max_net_limit.isNum() === false) {
-							errMsg = this.$t('ar.errMsg14');
-						}
-						break;
-					case "seven":
-						url = "/index.php?r=btc/config/risk-save";
-						if(this.dialogData.xy_call_margin_warn_percentage.isNum() === false || this.dialogData.xy_call_margin_warn_percentage.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg15');
-						}
-						if(this.dialogData.xy_cut_margin_warn_percentage.isNum() === false || this.dialogData.xy_cut_margin_warn_percentage.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg16');
-						}
-						if(this.dialogData.xj_call_margin_warn_percentage.isNum() === false || this.dialogData.xj_call_margin_warn_percentage.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg17');
-						}
-						if(this.dialogData.xj_cut_margin_warn_percentage.isNum() === false || this.dialogData.xj_cut_margin_warn_percentage.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg18');
-						}
-						if(this.dialogData.max_win_percentage.isNum() === false || this.dialogData.max_win_percentage.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg19');
-						}
-						break;
-					case "eight":
-						url = "/index.php?r=btc/config/order-diff-save";
-						if(this.dialogData.order_diff.isNum() === false || this.dialogData.order_diff.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg20');
-						}
-						break;
-					case "night":
-						debugger
-						url = "/index.php?r=btc/config/review-save";
-						if(this.dialogData.small_limit.isNum() === false || this.dialogData.small_limit.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg21');
-						} else if(this.dialogData.big_limit.isNum() === false || this.dialogData.big_limit.toInt() <= 0) {
-							errMsg = this.$t('ar.errMsg22');
-						} else if(this.dialogData.small_limit.toInt() >= this.dialogData.big_limit.toInt()) {
-							errMsg = this.$t('ar.errMsg23');
-						}
-						break;
-					case "ten":
-						url = "/index.php?r=btc/config/exchange-rate-save";
-						if(this.dialogData.exchange_rate.isNum() === false || this.dialogData.exchange_rate.toFloat() <= 0) {
-							errMsg = this.$t('ar.errMsg24');
-						}
-						break;
-					case "eleven":
-						url = "/index.php?r=btc/config/user-order-total-save";
-						if(this.dialogData.item_number.isNum() === false || this.dialogData.item_number.toFloat() <= 0) {
-							errMsg = this.$t('ar.errMsg25');
-						}
-						break;
-				}
-
-				if(errMsg != "") {
-					Message({
-						center: true,
-						message: errMsg,
-						duration: 1200,
-						type: 'error',
-						onClose: () => {
-							this.dialogLoading = false;
-						}
-					});
-					return;
-				}
-				request({
-					method: "post",
-					data: this.dialogData,
-					url: url
-				}).then(res => {
-					let data = res.data;
-					if(data.status == 1) {
-						Message({
-							center: true,
-							message: this.$t('ar.sucMsg1'),
-							duration: 1800,
-							type: 'success',
-
-						});
-						this.dialogLoading = false;
-						this.dialogPriceVisible = false;
-						this.getData(this.dialogType);
-					} else {
-						Message({
-							center: true,
-							message: this.$t('ar.errMsg26'),
-							duration: 1800,
-							type: 'warning',
-						});
-					}
-				});
-				this.dialogLoading = false;
-			}
-		}
-	};
+      if (errMsg != "") {
+        Message({
+          center: true,
+          message: errMsg,
+          duration: 1200,
+          type: "error",
+          onClose: () => {
+            this.dialogLoading = false;
+          }
+        });
+        return;
+      }
+      request({
+        method: "post",
+        data: this.dialogData,
+        url: url
+      }).then(res => {
+        let data = res.data;
+        if (data.status == 1) {
+          Message({
+            center: true,
+            message: this.$t("ar.sucMsg1"),
+            duration: 1800,
+            type: "success"
+          });
+          this.dialogLoading = false;
+          this.dialogPriceVisible = false;
+          this.getData(this.dialogType);
+        } else {
+          Message({
+            center: true,
+            message: this.$t("ar.errMsg26"),
+            duration: 1800,
+            type: "warning"
+          });
+        }
+      });
+      this.dialogLoading = false;
+    }
+  }
+};
 </script>

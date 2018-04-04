@@ -139,8 +139,31 @@ const en = {
 		'qsrsjhm': '请输入手机号码e',
 		'yzm': '验证码e',
 		'qsryzm': '请输入验证码e',
-		'cz': 'Reset'
-
+		'chz': 'Reset',
+		'order_direction':{
+			 '1':'Buy',
+			'-1':'Sell'
+		},
+		'order_type':{
+			'0':'建仓e',
+			'1':'平仓e'
+		},
+		'ddzt':'Order Status',
+		'order_status':{
+			'-1':'撤销e',
+			'0':'失败e',
+			'1':'正常e',
+			'2':'成交e'
+		},
+		'hold_order_status':{
+			'-1':'持仓完成e',
+			'1':'持仓中e'
+		},
+		'deal_type':{
+			'0':'用户委托e',
+			'1':'系统强制平仓e',
+			'2':'后台强制平仓e'
+		}
 	},
 	w: {
 		'gj': ' International',

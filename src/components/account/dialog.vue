@@ -1,7 +1,8 @@
 <template>
   <div class="common-proxy">
     <el-dialog :title="status+title" top="1vh" :close-on-press-escape="false" :close-on-click-modal="false" :visible.sync="visible" width="90%" :before-close="handleClose">
-      <el-form label-width="100px" :inline="true" ref="form" size="mini" :rules="rules" :model="form">
+      <!--  -->
+      <el-form label-width="100px" :inline="true" :rules="rules" ref="form" size="mini" :model="form">
         <el-row>
           <el-col :span="6">
             <el-form-item :label="title+'帐号'" prop="account">
@@ -85,7 +86,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row>
           <el-col :span="8">
             <el-table :data="frozenData" :border="false" size="mini">
@@ -233,6 +233,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="$emit('dialogClose')">取 消</el-button>
+        <!--  native-type="submit" -->
         <el-button size="mini" type="primary" native-type="submit" @click="onSubmit">确 定</el-button>
       </span>
     </el-dialog>
@@ -329,6 +330,7 @@ export default {
     return {
       comeinSwitch: false,
       onProxySwitch: false,
+      pwdRequire: false,
       patyType: "1",
       reBateModel: 10,
       parent_id: "",
@@ -408,13 +410,13 @@ export default {
             trigger: "blur"
           }
         ],
-        credit: [
-          {
-            required: true,
-            message: this.$t("message.emptyCredit"),
-            trigger: "blur"
-          }
-        ],
+        // credit: [
+        //   {
+        //     required: true,
+        //     message: this.$t("message.emptyCredit"),
+        //     trigger: "blur"
+        //   }
+        // ],
         open_fee: [
           {
             validator: (rule, value, callback) => {
@@ -445,6 +447,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_close_fee");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -458,6 +463,9 @@ export default {
                 Number(this.formLimit.min_order_diff)
               ) {
                 this.formMsg("err_order_diff");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -474,9 +482,13 @@ export default {
                 )
               ) {
                 this.formMsg("err_credit");
+                callback();
+              } else {
+                callback();
               }
             },
-            trigger: "blur"
+            trigger: "blur",
+            required: true
           }
         ],
         share_sum: [
@@ -490,6 +502,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_share_sum");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -506,6 +521,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_min_transaction");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -522,6 +540,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_transaction");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -539,6 +560,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_buy");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -555,6 +579,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_sale");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -571,6 +598,9 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_net");
+                callback();
+              } else {
+                callback();
               }
             },
             trigger: "blur"
@@ -689,6 +719,15 @@ export default {
     //   return this.mapData[this.viewLevel.toString()];
     // }
   },
+  watch: {
+    showType: function(val) {
+      if (!val) {
+        this.rules.repassword[0].required = val;
+      } else {
+        this.rules.repassword[0].required = true;
+      }
+    }
+  },
   created() {
     for (let i = 1; i < 10; i++) {
       this.frozen.push({
@@ -725,11 +764,12 @@ export default {
       this.form.order_diff_dicount_percentage = 0;
       this.form.showLimit = 1;
       this.form.account_type = 1;
-      console.log(this.form);
     },
     onSubmit() {
+      console.log(this.$refs.form);
       this.$refs.form.validate(valid => {
         if (valid) {
+          console.log(valid, this.data);
           if (this.viewLevel == 1) {
             this.$store.dispatch("SAVEAGENT", this.form).then(e => {
               this.msg(e);

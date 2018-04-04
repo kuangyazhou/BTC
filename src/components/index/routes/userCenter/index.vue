@@ -4,10 +4,10 @@
 			<el-row>
 				<el-col :span="4">
 					<div class="leftBar">
-						<div >
+						<div>
 							账号：<span></span>
 						</div>
-						<div >
+						<div>
 							余额：<span></span>
 						</div>
 						<el-button>充值</el-button>
@@ -63,21 +63,24 @@
 					label: '银行卡转账',
 					path: '/pay1'
 
-				}, {
-					value: 1,
-					label: '在线支付',
-					path: '/onlinePay1'
-
-				}, {
-					value: 2,
-					label: '微信支付',
-					path: '/wechatPay'
-
-				}, {
-					value: 3,
-					label: 'QQ钱包',
-					path: 'qqPay'
-				}]
+				}
+//				,
+//				{
+//					value: 1,
+//					label: '在线支付',
+//					path: '/onlinePay1'
+//
+//				}, {
+//					value: 2,
+//					label: '微信支付',
+//					path: '/wechatPay'
+//
+//				}, {
+//					value: 3,
+//					label: 'QQ钱包',
+//					path: 'qqPay'
+//				}
+				]
 			}
 		},
 		methods: {
@@ -136,13 +139,13 @@
 							padding: 0px 0 3px 53px;
 							background: url('./img/rbank.png') no-repeat 10px 0;
 						}
-						li:nth-child(2){
+						li:nth-child(2) {
 							background-position: 10px -400px;
 						}
-						li:nth-child(3){
+						li:nth-child(3) {
 							background-position: 10px -50px;
 						}
-						li:nth-child(4){
+						li:nth-child(4) {
 							background-position: 10px -100px;
 						}
 						li.on {

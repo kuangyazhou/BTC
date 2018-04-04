@@ -50,7 +50,11 @@ service.interceptors.response.use(
     let old = loadToken();
     requestPipe(response);
     // response时验证token，返回token并且与本地不同时，存储
-    if (response.headers.authorization && (response.headers.authorization != old)) {
+    // if (response.headers.authorization && (response.headers.authorization != old)) {
+    //   setToken(response.headers.authorization);
+    //   console.log(old, response.headers.authorization, '更新token');
+    // }
+    if (response.headers.authorization) {
       setToken(response.headers.authorization);
       console.log(old, response.headers.authorization, '更新token');
     }

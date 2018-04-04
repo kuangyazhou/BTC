@@ -35,7 +35,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="onSubmit">{{$t('l.reg')}}</el-button>
-					<el-button type="primary" @click="reset">{{$t('l.cz')}}</el-button>
+					<el-button type="primary" @click="reset">{{$t('l.chz')}}</el-button>
 				</el-form-item>
 			</el-form>
 		</div>
