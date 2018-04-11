@@ -1,16 +1,17 @@
 <template>
 	<div class="index">
 		<header>
-			<img src="./img/logo.png" class="logo" @click.stop="$router.push({'path':'/welcome'})"/>
+			<img src="./img/logo.png" class="logo" @click.stop="$router.push({'path':'/welcome'})" />
 			<span class="title">
 				{{$t('l.aqkkdjypt')}}
 			</span>
-			<span class="tab" >
+			<span class="tab">
 				<el-button type="primary" class="user-button" @click.stop="$router.push({'path':'/userlogin'})" v-if="!loginStatus">登录/LOGIN</el-button>
 				<el-button type="primary" class="user-button" @click.stop="logout" v-if="loginStatus">退出/LOGOUT</el-button>
-				<el-button type="primary" class="user-button" @click="$router.push({'path':'/userCenter'})">{{$t('l.cz')}}</el-button>
-				<el-button type="primary" class="user-button">{{$t('l.tx')}}</el-button>
-				<el-button type="primary" class="user-button">{{$t('l.dd')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/userCenter'})" v-if="loginStatus">{{$t('l.cz')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/withDraw'})" v-if="loginStatus">{{$t('l.tx')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/order'})" v-if="loginStatus">{{$t('l.dd')}}</el-button>
+					<el-button type="primary" class="user-button" @click="$router.push({'path':'/'})" >{{$t('l.jy')}}</el-button>
 				<el-dropdown @command="changeLn">
 				  <el-button type="primary" class="lang-button" round medium >
 				    {{language}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -26,7 +27,7 @@
 			</span>
 		</header>
 		<div class="body-content">
-			<router-view ></router-view>
+			<router-view></router-view>
 		</div>
 		<footer>
 			<div class="wrap-link">
@@ -88,6 +89,7 @@
 
 <script>
 	import Vue from "vue";
+	import { getUserInfo } from "@/utils/apiUtils";
 	import {
 		Button,
 		Dropdown,
@@ -101,20 +103,30 @@
 	Vue.use(DropdownItem);
 
 	export default {
-        computed:{
-        	loginStatus:function(){
-        		return this.$store.state.user.token
-        	}
-        },
+		watch:{
+			loginStatus:function(val){
+				if(!val){
+					this.$router.push({'path':'/'})
+				}
+			}
+		},
+		computed: {
+			loginStatus: function() {
+				return this.$store.state.user.userInfo || getUserInfo()
+			}
+		},
 		mounted() {
 			this.lg = localStorage.getItem("lang");
 			this.language = this.lag[this.lg];
 			this.$i18n.locale = this.lg; //设置语言
-
+			var marketSocketUrl = "ws://192.168.123.136:8888/kline"; //websocket地址
+		    this.marketSocket = new WebSocket(marketSocketUrl);
+		    this.setWebSocket();
 		},
-
 		data() {
 			return {
+				reConnect: true,
+				dayPrice:[0,0,0,0,0],
 				language: '简体中文',
 				lag: {
 					'cn': '简体中文',
@@ -124,16 +136,60 @@
 			}
 		},
 		methods: {
-			logout(){
-				   this.$store.dispatch("userlogout");
-		
-                             
+			setWebSocket() {
+				var that = this;
+				that.marketSocket.onopen = function(evt) {
+					var sendData = '{"Flag":3,"Sub":"btc/minute1","Msg":"","Status":0}';
+
+					that.marketSocket.send(sendData);
+				};
+				that.marketSocket.onerror = function() {};
+				that.marketSocket.onclose = function() {
+					// 关闭 websocket
+					console.log("连接已关闭...");
+					if(!that.reConnect) {
+						return;
+					}
+
+					setTimeout(function() {
+						var marketSocketUrl = "ws://192.168.123.136:8888/kline "; //websocket地址
+						that.marketSocket = new WebSocket(marketSocketUrl);
+						that.setWebSocket();
+						console.log("连接重连...");
+					}, 1000);
+				};
+				that.marketSocket.onmessage = function(evt) {
+					var data = JSON.parse(evt.data);
+					//回复心跳
+					if(data.Flag == 1) {
+						const heartbeat = JSON.parse(evt.data).Msg;
+
+						that.marketSocket.send(
+							'{"Flag":2,"Msg":"' + heartbeat + '","Status":0}'
+						);
+						return;
+					}
+
+					that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
+					that.$store.commit('getPrice',that.dayPrice);
+
+				};
+			},
+			logout() {
+				this.$store.dispatch("userlogout");
+				
+				
 			},
 			changeLn(command) {
 				this.language = this.lag[command];
 				localStorage.setItem("lang", command);
 				this.$i18n.locale = command; //设置语言
 			}
+		},
+		beforeDestroy() {
+			this.marketSocket.send('{"Flag":5,"Msg":"","Status":0}');
+			this.reConnect = false;
+			this.marketSocket.close();
 		}
 	}
 </script>
@@ -149,16 +205,14 @@
 		color: #f2f2f2;
 		font-size: 14px;
 		background: #388dde;
-		.logo{
+		.logo {
 			cursor: pointer;
 			margin-top: 5px;
-			float:left;
+			float: left;
 		}
-		.title{
+		.title {
 			vertical-align: middle;
-			
 		}
-		
 		.tab {
 			float: right;
 			font-weight: bold;

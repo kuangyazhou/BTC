@@ -169,6 +169,7 @@
 		},
 	
 		mounted() {
+		
 			var marketSocketUrl = "ws://192.168.123.136:8888/kline"; //websocket地址
 			var marketUserName = " "; //websocket名字
 			var marketPassword = " "; //websocket密码
@@ -204,6 +205,7 @@
 			//				console.log(params);
 			//			});
 			this.setTime();
+			
 			this.setWebSocket(this.marketSocket, this.preClock + '/' + this.clock, this.tabValue);
 			window.onresize = function() {
 				that.myChart.resize();
@@ -299,7 +301,7 @@
 					if(!that.reConnect) {
 						return;
 					}
-				
+					
 					setTimeout(function() {
 						var marketSocketUrl = "ws://192.168.123.136:8888/kline "; //websocket地址			
 						that.marketSocket = new WebSocket(marketSocketUrl);
@@ -365,7 +367,7 @@
 						var arrn = data.kLine[0];
 						//设置分时图显示
 						that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
-						that.$emit('setInitialPrice',that.dayPrice[0][2]);
+						that.$emit('setInitialPrice',that.dayPrice);
 						that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
                         //document.title = (that.dayPrice[0][2]).toFixed(3)+' BTC 交易系统'                       	
 						//console.log( data.kLine[0]);
@@ -913,7 +915,8 @@
 		beforeDestroy() {
 			this.marketSocket.send('{"Flag":5,"Msg":"","Status":0}');
 			this.reConnect = false;
-			this.marketSocket.close()
+			this.marketSocket.close();
+
 		}
 	}
 </script>

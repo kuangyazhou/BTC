@@ -6,14 +6,13 @@ import router from './router'
 import i18n from '@/i18n/i18n';
 import store from '@/store';
 
-
 import {
-  currency,
-  pen
+	currency,
+	pen
 } from '@/utils/currency';
 
 import {
-  loadToken
+	loadToken
 } from '@/utils/apiUtils';
 
 import '@/mock/index.js';
@@ -32,34 +31,35 @@ Vue.filter('currency', currency);
 Vue.filter('percentage', pen);
 
 router.beforeEach((to, from, next) => {
-  let token = loadToken();
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!token) {
-      // location.replace(`/login`)
-      next({
-        path: '/login',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    } else {
-      next()
-    }
-  } else {
-    next()
-  }
-  next();
-});
+	let token = loadToken();
 
+	if(to.matched.some(record => record.meta.requiresAuth)) {
+		if(!token && !store.state.user.loginByAccount) {
+			// location.replace(`/login`)
+
+			next({
+				path: '/login',
+				query: {
+					redirect: to.fullPath
+				}
+			})
+		} else{
+			next()
+		}
+	} else {
+		next()
+	}
+	next();
+});
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  store,
-  i18n,
-  components: {
-    App
-  },
-  template: '<App/>'
+	el: '#app',
+	router,
+	store,
+	i18n,
+	components: {
+		App
+	},
+	template: '<App/>'
 })

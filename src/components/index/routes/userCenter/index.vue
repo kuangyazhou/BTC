@@ -5,15 +5,25 @@
 				<el-col :span="4">
 					<div class="leftBar">
 						<div>
-							账号：<span></span>
+							<span class="stc_t">账号：</span><span v-if="userInfo">{{userInfo.user_name||''}}</span>
 						</div>
 						<div>
-							余额：<span></span>
+							<span class="stc_t">余额：</span><span v-if="userInfo">{{userInfo.avail_deposit_amount}}</span>
 						</div>
-						<el-button>充值</el-button>
-						<el-button>提现</el-button>
-						<div>交易记录</div>
-						<div>账户管理</div>
+						<el-button @click="$router.push({'path':'/userCenter'})">充值</el-button>
+						<el-button @click="$router.push({'path':'/withDraw'})">提现</el-button>
+						
+
+						<el-collapse v-model="activeName" accordion>
+						  <el-collapse-item title="交易记录" name="1">
+						    
+						    <div>交易记录</div>
+						  </el-collapse-item>
+						  <el-collapse-item title="账户管理" name="2">
+						    <el-button @click="$router.push({'path':'/cardList'})">银行卡管理</el-button>
+						  </el-collapse-item>
+						
+						</el-collapse>
 					</div>
 				</el-col>
 				<el-col :span="20">
@@ -22,17 +32,7 @@
 							充值
 						</div>
 						<div class="con_box">
-							<div class="content">
-								<div class="tab_head">
-									<ul>
-										<li v-for="(item,index) in menu" @click.stop="handleClick(index)" :class="{'on':active==item.value}" :key="index">{{item.label}}</li>
-									</ul>
-								</div>
-								<div class="content_bd">
-									<router-view></router-view>
-								</div>
-
-							</div>
+							<router-view></router-view>
 						</div>
 					</div>
 
@@ -48,48 +48,31 @@
 		Carousel,
 		CarouselItem,
 		Row,
-		Col
+		Col,
+		Collapse,
+		CollapseItem
 	} from "element-ui";
 	Vue.use(Carousel);
 	Vue.use(CarouselItem);
+	Vue.use(Collapse);
+	Vue.use(CollapseItem);
 	Vue.use(Row);
 	Vue.use(Col);
+	import { getUserInfo } from "@/utils/apiUtils";
 	export default {
 		data() {
 			return {
-				active: 0,
-				menu: [{
-					value: 0,
-					label: '银行卡转账',
-					path: '/pay1'
-
-				}
-//				,
-//				{
-//					value: 1,
-//					label: '在线支付',
-//					path: '/onlinePay1'
-//
-//				}, {
-//					value: 2,
-//					label: '微信支付',
-//					path: '/wechatPay'
-//
-//				}, {
-//					value: 3,
-//					label: 'QQ钱包',
-//					path: 'qqPay'
-//				}
-				]
+				activeName:''
+			}
+		},
+		computed:{
+			userInfo:function(){
+				
+				return this.$store.state.user.userInfo || getUserInfo()
 			}
 		},
 		methods: {
-			handleClick(index) {
-				this.active = index;
-				this.$router.push({
-					'path': this.menu[index].path
-				})
-			}
+			
 		}
 	}
 </script>
@@ -102,6 +85,15 @@
 			height: 700px;
 			padding-left: 20px;
 			border-right: 1px solid #d0d0d0;
+			&>div{
+				padding-top: 6px;
+			    line-height: 32px;
+			    height: 34px;
+			    margin-bottom: 12px;
+			}
+			.stc_t{
+				padding-left: 48px;
+			}
 		}
 		.rightcontent {
 			.head {
@@ -113,53 +105,7 @@
 			}
 			.con_box {
 				background: #ededed;
-				.content {
-					width: auto;
-					min-height: 500px;
-					margin: 10px;
-					padding: 32px 24px;
-					background: #fff;
-					box-shadow: 0px 1px 4px rgba( 0, 0, 0, 0.35);
-					.tab_head {
-						height: 49px;
-						border-bottom: 1px solid #ebebeb;
-						li {
-							list-style: none;
-							float: left;
-							margin-left: 3px;
-							width: 101px;
-							height: 45px;
-							font-size: 16px;
-							line-height: 45px;
-							text-align: left;
-							color: #777777;
-							cursor: pointer;
-							border: 1px solid #dadada;
-							border-bottom: none;
-							padding: 0px 0 3px 53px;
-							background: url('./img/rbank.png') no-repeat 10px 0;
-						}
-						li:nth-child(2) {
-							background-position: 10px -400px;
-						}
-						li:nth-child(3) {
-							background-position: 10px -50px;
-						}
-						li:nth-child(4) {
-							background-position: 10px -100px;
-						}
-						li.on {
-							border-top: 3px solid #ea3146;
-							background-color: #fff;
-							color: #333;
-						}
-					}
-					.content_bd {
-						margin-top: 20px;
-						padding: 0;
-						text-align: left;
-					}
-				}
+	
 			}
 		}
 	}

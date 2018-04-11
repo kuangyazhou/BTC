@@ -73,13 +73,13 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="6" v-if="viewLevel>1">
+          <!-- <el-col :span="6" v-if="viewLevel>1">
             <el-form-item label="代理斩仓" prop='force'>
               <el-input></el-input>
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
-        <el-row v-if="viewLevel==5">
+        <el-row v-if="viewLevel==5&&!form.account_type">
           <el-col :span="6">
             <el-form-item label="验证码" prop='code'>
               <el-input></el-input>
@@ -232,7 +232,8 @@
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="$emit('dialogClose')">取 消</el-button>
+        <!-- $emit('dialogClose') -->
+        <el-button size="mini" @click="handleClose">取 消</el-button>
         <!--  native-type="submit" -->
         <el-button size="mini" type="primary" native-type="submit" @click="onSubmit">确 定</el-button>
       </span>
@@ -327,6 +328,38 @@ Vue.use(DropdownItem);
 export default {
   name: "AccountDialog",
   data() {
+    const empty = {
+      formError: null,
+      account: null,
+      name: null,
+      password: "",
+      repassword: "",
+      account_type: 0,
+      credit: null,
+      open_service_fee_percentage: null,
+      close_service_fee_percentage: null,
+      order_diff: null,
+      close_order_buy: null,
+      close_order_sale: null,
+      close_order_undo: null,
+      share_sum: null,
+      close_service_fee_percentage: null,
+      deposit_frozen_percentage: null,
+      deposit_used_percentage: null,
+      max_buy_limit: null,
+      max_net_limit: null,
+      max_sale_limit: null,
+      open_order_buy: null,
+      open_order_sale: null,
+      open_order_undo: null,
+      open_service_fee_percentage: null,
+      order_diff: null,
+      single_max_transaction: null,
+      single_min_transaction: null,
+      max_member_number: null,
+      order_diff_dicount_percentage: 0,
+      showLimit: 1
+    };
     return {
       comeinSwitch: false,
       onProxySwitch: false,
@@ -407,7 +440,15 @@ export default {
           {
             required: true,
             message: this.$t("message.emptyPwd"),
-            trigger: "blur"
+            trigger: "blur",
+            validator: (rule, value, callback) => {
+              if (this.form.password != this.form.repassword) {
+                this.formMsg("err_pwd_diff");
+                callback();
+              } else {
+                callback();
+              }
+            }
           }
         ],
         // credit: [
@@ -729,7 +770,7 @@ export default {
     }
   },
   created() {
-    for (let i = 1; i < 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       this.frozen.push({
         value: i * 10,
         label: i * 10 + "%"
@@ -751,25 +792,16 @@ export default {
     },
     handleClose(done) {
       this.$emit("dialogClose");
+      // Object.assign(this.form, empty);
       this.$refs.form.resetFields(); // 此方法清空表单失败了 fuck
     },
     comeinClose(done) {
       this.comeinSwitch = false;
       this.$refs["comein"].resetFields();
     },
-    cleanForm() {
-      for (let item in this.form) {
-        this.form[item] = "";
-      }
-      this.form.order_diff_dicount_percentage = 0;
-      this.form.showLimit = 1;
-      this.form.account_type = 1;
-    },
     onSubmit() {
-      console.log(this.$refs.form);
       this.$refs.form.validate(valid => {
         if (valid) {
-          console.log(valid, this.data);
           if (this.viewLevel == 1) {
             this.$store.dispatch("SAVEAGENT", this.form).then(e => {
               this.msg(e);
@@ -835,7 +867,7 @@ export default {
           Object.assign(this.form, this.creditForm); //默认使用信用模式
           Object.assign(this.formLimit, this.creditLimit); //信用模式限制条件
           this.form.credit = this.formLimit.max_credit;
-          this.form.share_sum = this.formLimit.max_share_sum;
+          // this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
     },
@@ -846,7 +878,7 @@ export default {
           Object.assign(this.form, data.user);
           Object.assign(this.formLimit, data.user_limit);
           this.form.credit = this.formLimit.max_credit;
-          this.form.share_sum = this.formLimit.max_share_sum;
+          // this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
     },
@@ -857,7 +889,7 @@ export default {
           Object.assign(this.form, data.user);
           Object.assign(this.formLimit, data.user_limit);
           this.form.credit = this.formLimit.max_credit;
-          this.form.share_sum = this.formLimit.max_share_sum;
+          // this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
     },

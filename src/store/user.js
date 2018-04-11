@@ -21,13 +21,11 @@ import {
 } from '@/api/account';
 
 import {
-  loadToken,
+  getUserInfo,
   setToken,
   setUserInfo,
-  getUserInfo
 } from '@/utils/apiUtils';
 
-import router from '@/router';
 
 // 帐号管理功能业务逻辑及条件
 // 1.管理员新增、修改、保存一级代理时，调用top-agent save-topAgent modifyTopAgent接口
@@ -36,10 +34,13 @@ import router from '@/router';
 
 const user = {
   state: {
-    userInfo: null,
-    userName: null,
+    userInfo: getUserInfo() || null,
+    dayPrice:[[0,0,0,0,0]],
+    range:0,
+    userName: null,    
     level: null,
-    token: false
+    token: false,
+    loginByAccount: sessionStorage.getItem('loginByAccount') || null
   },
   mutations: {
     SET_USER: (state, user) => {
@@ -48,15 +49,33 @@ const user = {
       state.level = user.data.level;
       state.token = true;
     },
+    	//存储价格
+  	getPrice(state,dayPrice){
+  		state.dayPrice = dayPrice;
+  		state.range = (
+          (dayPrice[0][2] - dayPrice[0][1]) /
+          dayPrice[0][1] *
+          100
+        ).toFixed(2);
+  	},
+    SET_Account: (state) => {
+      state.loginByAccount = true;
+      sessionStorage.setItem('loginByAccount', true)
+    },
+    SET_admin: (state) => {
+      sessionStorage.removeItem('loginByAccount');
+      state.loginByAccount = null;
+    },
     LOGIN_OUT: (state) => {
       setToken('user_id_token', null);
-      state.userInfo = null;
       state.token = false;
+      state.userInfo = false;
       sessionStorage.removeItem('user_id_token');
       sessionStorage.removeItem('user');
     }
   },
   actions: {
+  
     // 登录
     loginByuserName({
       commit
@@ -67,6 +86,7 @@ const user = {
         // 当res中带有token并且与本地token不同时，更新一次;
         // setToken(response.headers.authorization);
         commit('SET_USER', response.data);
+        commit('SET_admin');
         setUserInfo(response.data.data);
         return response;
         // resolve();
@@ -83,6 +103,7 @@ const user = {
         // 当res中带有token并且与本地token不同时，更新一次;
         // setToken(response.headers.authorization);
         commit('SET_USER', response.data);
+        commit('SET_Account');
         setUserInfo(response.data.data);
         return response;
         // resolve();

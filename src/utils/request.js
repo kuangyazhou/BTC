@@ -47,7 +47,8 @@ service.interceptors.request.use(config => {
 
 service.interceptors.response.use(
   response => {
-    let old = loadToken();
+    var old = loadToken();
+
     requestPipe(response);
     // response时验证token，返回token并且与本地不同时，存储
     // if (response.headers.authorization && (response.headers.authorization != old)) {
@@ -55,6 +56,7 @@ service.interceptors.response.use(
     //   console.log(old, response.headers.authorization, '更新token');
     // }
     if (response.headers.authorization) {
+   
       setToken(response.headers.authorization);
       console.log(old, response.headers.authorization, '更新token');
     }
@@ -70,15 +72,25 @@ service.interceptors.response.use(
         duration: 1800,
         type: 'error',
         onClose: () => {
-          window.location.replace('/login');
+        	if(!store.state.user.loginByAccount){
+        		window.location.replace('/login');
+        	}
+          
         }
       });
     }
     return response;
   },
   err => {
-    console.log(err);
-    Promise.reject(err);
+    // console.log(err);
+    // Promise.reject(err);
+    console.log('err' + err);
+    Message({
+      message: '服务器故障',
+      type: 'error',
+      duration: 5 * 1000
+    });
+    return Promise.reject(err);
   }
 )
 

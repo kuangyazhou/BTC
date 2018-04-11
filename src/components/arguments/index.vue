@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<el-tabs v-model="activeName" @tab-click="handleClick">
+		<el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
 			<el-tab-pane :label="$t('ar.jgrd')" name="first" v-if="userInfo.level == 0 ">
 				<el-table :data="tableBlownData" stripe style="width: 800px">
 					<el-table-column prop="id" label="#" align="center" width="100px">
@@ -774,7 +774,7 @@ export default {
   methods: {
     handleClick(tab, event) {
       this.getData(tab.$options.propsData.name);
-      console.log(tab, event);
+      // console.log(tab, event);
     },
     getData(tab) {
       var url;

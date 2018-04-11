@@ -15,21 +15,29 @@ const Index = resolve => require(['@/components/index/index.vue'], resolve);
 
 const Welcome = resolve => require(['@/components/index/routes/welcome.vue'], resolve);
 
+const Order = resolve => require(['@/components/index/routes/order.vue'], resolve);
+
 const UserCenter = resolve => require(['@/components/index/routes/userCenter/index.vue'], resolve);
 
-const Pay1 = resolve => require(['@/components/index/routes/userCenter/pay1.vue'], resolve);
+const Recharge = resolve => require(['@/components/index/routes/userCenter/Recharge/index.vue'], resolve);
 
-const Pay2 = resolve => require(['@/components/index/routes/userCenter/pay2.vue'], resolve);
+const Pay1 = resolve => require(['@/components/index/routes/userCenter/Recharge/pay1.vue'], resolve);
 
-const Pay3 = resolve => require(['@/components/index/routes/userCenter/pay3.vue'], resolve);
+const Pay2 = resolve => require(['@/components/index/routes/userCenter/Recharge/pay2.vue'], resolve);
 
-const OnlinePay1 = resolve => require(['@/components/index/routes/userCenter/onlinePay1.vue'], resolve);
+const Pay3 = resolve => require(['@/components/index/routes/userCenter/Recharge/pay3.vue'], resolve);
 
-const OnlinePay2 = resolve => require(['@/components/index/routes/userCenter/onlinePay2.vue'], resolve);
+const OnlinePay1 = resolve => require(['@/components/index/routes/userCenter/Recharge/onlinePay1.vue'], resolve);
 
-const WechatPay = resolve => require(['@/components/index/routes/userCenter/wechatPay.vue'], resolve);
+const WechatPay = resolve => require(['@/components/index/routes/userCenter/Recharge/wechatPay.vue'], resolve);
 
-const QQPay = resolve => require(['@/components/index/routes/userCenter/qqPay.vue'], resolve);
+const QQPay = resolve => require(['@/components/index/routes/userCenter/Recharge/qqPay.vue'], resolve);
+
+const WithDraw = resolve => require(['@/components/index/routes/userCenter/withDraw/withDraw.vue'], resolve);
+
+const CardList = resolve => require(['@/components/index/routes/userCenter/withDraw/cardList.vue'], resolve)
+
+const AddCard = resolve => require(['@/components/index/routes/userCenter/withDraw/addCard.vue'], resolve)
 
 const Trade = resolve => require(['@/components/index/routes/trade/index.vue'], resolve);
 
@@ -74,6 +82,10 @@ export default new Router({
         component: Welcome,
 
       }, {
+        path: '/order',
+        component: Order,
+
+      }, {
         path: '/',
         name: 'Trade',
         component: Trade,
@@ -89,38 +101,46 @@ export default new Router({
         path: '/userCenter',
         component: UserCenter,
         children: [{
-            path: '/',
-            component: Pay1
-          }, {
-            path: '/pay1',
-            component: Pay1
-          },
-          {
-            path: '/pay2',
-            component: Pay2
-          },
-          {
-            path: '/pay3',
-            component: Pay3
-          },
-          {
-            path: '/onlinePay1',
-            component: OnlinePay1
-          },
-          {
-            path: '/onlinePay2',
-            component: OnlinePay2
-          },
-          {
-            path: '/wechatPay',
-            component: WechatPay
-          },
-          {
-            path: '/qqPay',
-            component: QQPay
-          }
-
-        ]
+          path: '/',
+          component: Recharge,
+          children: [{
+              path: '/',
+              component: Pay1
+            }, {
+              path: '/pay1',
+              component: Pay1
+            },
+            {
+              path: '/pay2',
+              component: Pay2
+            },
+            {
+              path: '/pay3',
+              component: Pay3
+            },
+            {
+              path: '/onlinePay1',
+              component: OnlinePay1
+            },
+            {
+              path: '/wechatPay',
+              component: WechatPay
+            },
+            {
+              path: '/qqPay',
+              component: QQPay
+            }
+          ]
+        }, {
+          path: '/withDraw',
+          component: WithDraw
+        }, {
+          path: '/cardList',
+          component: CardList
+        }, {
+          path: '/addCard',
+          component: AddCard
+        }]
       }]
     },
     {

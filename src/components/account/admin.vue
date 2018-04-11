@@ -151,14 +151,11 @@ export default {
       // console.log(val);
       switch (val) {
         case "add":
-          this.$store.dispatch("addAdmin", {}).then(res => {
-            // console.log(res);
-          });
+          this.$store.dispatch("addAdmin", {}).then(res => {});
+          this.$refs.adminForm.resetFields();
         case "detail":
-          // this.$store.dispatch("");
           break;
         case "role":
-          // this.$store.dispatch("");
           break;
         case "update":
           this.rules.repassword[0].required = false;

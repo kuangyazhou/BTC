@@ -1,6 +1,7 @@
 <div class="trade">
 
-	<tradeDialog ref="dialog" :userInfos="userInfo" :orders="sendOrder"></tradeDialog>	
+	<closeOut ref="dialog" :orders="orders"></closeOut>
+
 	<div class="left-info">
 		<div class="loginBox" v-if="!loginStatus">
 			<el-button type="primary" class="login-button" @click="$router.push({'path':'/userlogin'})">{{$t('l.login')}}</el-button>
@@ -20,7 +21,7 @@
 					</div>
 					<div class="user-item item-right">
 						<span class="top">{{$t('l.st')}}</span>
-						<span>{{$t('l.status')[userInfo.status]}}</span>
+						<span>{{$t('l.status['+(userInfo.status||1)+']')}}</span>
 						<span class="top">{{$t('l.project')}}</span>
 						<span>BTC</span>
 					</div>
@@ -98,10 +99,16 @@
 					<div class="range">{{$t('l.rg')}}</div>
 				</div>
 				<div class="goodsLists">
-					<div class="goods-item" v-for="(item,index) in goodsList">
+					<!--<div class="goods-item" v-for="(item,index) in goodsList">
 						<div class="name">{{item.name}}</div>
 						<div class="price">{{(item.price).toFixed(5)}}</div>
 						<div class="range">{{item.range+'%'}}</div>
+					</div>-->
+					<div class="goods-item">
+						<div class="name">BTC</div>
+						<div class="price">{{BTCPrice[0][2].toFixed(3)}}</div>
+						<div class="range">{{((BTCPrice[0][2] - BTCPrice[0][1]) / BTCPrice[0][1] * 100).toFixed(2)+'%' }}</div>
+						
 					</div>
 				</div>
 			</div>
@@ -167,7 +174,7 @@
 							<div class="input-text" v-if="entrusted_type==0">
 								<div class="label">{{$t('ar.bjdc')}}</div>
 								<label>
-                     					<input type="text" maxlength="14" v-model="sellRange"/>
+                     					<input type="text" maxlength="14" v-model="buyRange"/>
                      					<span>USDT</span>
                      			</label>
 
@@ -181,7 +188,7 @@
 
 							</div>
 							<div class="account-range">
-								<span class="min">{{$t('ar.sxf')}} {{buyPrice*buyNum*userInfo.open_fee_percentage||0.000}} USDT</span>
+								<span class="min">{{$t('ar.sxf')}} {{buyPrice*buyNum*userInfo.open_fee_percentage/100||0.000}} USDT</span>
 								<!--<span class="max">0.0000 USDT</span>-->
 								<div class="total" v-if="entrusted_type==1">
 									{{$t('l.jye')}} {{buyPrice*buyNum}} USDT
@@ -194,7 +201,7 @@
 					</div>
 					<div class="panel">
 						<div class="hd">
-			
+
 						</div>
 						<div class="bd">
 							<div class="input-text input-price" v-if="entrusted_type==1">
@@ -234,7 +241,7 @@
 							<div class="input-text" v-if="entrusted_type==0">
 								<div class="label">{{$t('ar.bjdc')}}</div>
 								<label>
-                     					<input type="text" maxlength="14" v-model="buyRange"/>
+                     					<input type="text" maxlength="14" v-model="sellRange"/>
                      					<span>USDT</span>
                      			</label>
 
@@ -249,7 +256,7 @@
 							</div>
 
 							<div class="account-range">
-								<span class="min">{{$t('ar.sxf')}} {{sellPrice*sellNum*userInfo.open_fee_percentage||0.000}} USDT</span>
+								<span class="min">{{$t('ar.sxf')}} {{sellPrice*sellNum*userInfo.open_fee_percentage/100||0.000}} USDT</span>
 								<!--<span class="max">0.0000 USDT</span>-->
 								<div class="total" v-if="entrusted_type==1">
 									{{$t('l.jye')}} {{sellPrice*sellNum}} USDT
@@ -269,7 +276,7 @@
 				<div class="head">
 					{{$t('l.wtdd')}}
 				</div>
-				<el-table :data="my_orders.order_entrusted_lists" style="width: 100%">
+				<el-table :data="my_orders.order_entrusted_lists||[]" style="width: 100%">
 					<el-table-column prop="order_number" :label="$t('l.wtdddh')">
 					</el-table-column>
 					<el-table-column prop="order_date" :label="$t('l.wtsj')">
@@ -278,12 +285,12 @@
 					</el-table-column>
 					<el-table-column :label="$t('l.jcpc')">
 						<template slot-scope="scope">
-							{{$t('l.order_type')[scope.row.order_type]}}
+							{{$t('l.order_type['+scope.row.order_type+']')}}
 						</template>
 					</el-table-column>
 					<el-table-column :label="$t('l.mmfx')">
 						<template slot-scope="scope">
-							{{$t('l.order_direction')[scope.row.order_direction]}}
+							{{$t('l.order_direction['+scope.row.order_direction+']')}}
 						</template>
 					</el-table-column>
 					<el-table-column prop="entrusted_number" :label="$t('l.wtsl')">
@@ -298,12 +305,12 @@
 					</el-table-column>
 					<el-table-column :label="$t('l.ddzt')">
 						<template slot-scope="scope">
-							{{$t('l.order_status')[scope.row.order_status]}}
+							{{($t('l.order_status['+scope.row.order_status+']'))}}
 						</template>
 					</el-table-column>
-					<el-table-column :label="$t('ar.cz')" v-if="canUndo"  fixed="right">
+					<el-table-column :label="$t('ar.cz')" v-if="canUndo" fixed="right">
 						<template slot-scope="scope">
-							<el-button @click="undoClick(scope.row)" type="text" size="small">撤单</el-button>
+							<el-button @click="undoClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1">{{$t('l.chedan')}}</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -320,7 +327,7 @@
 					</el-table-column>
 					<el-table-column :label="$t('l.mmfx')">
 						<template slot-scope="scope">
-							{{$t('l.order_direction')[scope.row.order_direction]}}
+							{{$t('l.order_direction['+scope.row.order_direction+']')}}
 						</template>
 					</el-table-column>
 					<el-table-column prop="holding_number" :label="$t('l.ccsl')">
@@ -341,14 +348,14 @@
 					</el-table-column>
 					<el-table-column prop="entrusted_times" :label="$t('l.jcsj')">
 					</el-table-column>
-					<el-table-column  :label="$t('l.ddzt')">
+					<el-table-column :label="$t('l.ddzt')">
 						<template slot-scope="scope">
-							{{$t('l.hold_order_status')[scope.row.order_status]}}
+							{{($t('l.hold_order_status['+scope.row.order_status+']'))}}
 						</template>
 					</el-table-column>
 					<el-table-column :label="$t('ar.cz')" fixed="right">
 						<template slot-scope="scope">
-							<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1">平仓</el-button>
+							<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1">{{$t('ar.pc')}}</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -356,29 +363,31 @@
 					{{$t('l.cjdd')}}
 				</div>
 				<el-table :data="my_orders.order_deal_lists" style="width: 100%">
-					<el-table-column prop="hold_order_number" :label="$t('l.ccdh')" >
+					<el-table-column prop="order_number" :label="$t('l.cjdh')">
 					</el-table-column>
-					<el-table-column prop="order_times" :label="$t('l.cjsj')" >
+					<el-table-column prop="hold_order_number" :label="$t('l.ccdh')">
 					</el-table-column>
-					<el-table-column prop="product_name" :label="$t('l.spmc')" >
+					<el-table-column prop="order_times" :label="$t('l.cjsj')">
+					</el-table-column>
+					<el-table-column prop="product_name" :label="$t('l.spmc')">
 					</el-table-column>
 					<el-table-column :label="$t('l.jcpc')">
 						<template slot-scope="scope">
-							{{$t('l.order_type')[scope.row.order_type]}}
+							{{$t('l.order_type['+scope.row.order_type+']')}}
 						</template>
 					</el-table-column>
 					<el-table-column :label="$t('l.mmfx')">
 						<template slot-scope="scope">
-							{{$t('l.order_direction')[scope.row.order_direction]}}
+							{{$t('l.order_direction['+scope.row.order_direction+']')}}
 						</template>
 					</el-table-column>
-					<el-table-column prop="deal_number" :label="$t('l.cjl')" >
+					<el-table-column prop="deal_number" :label="$t('l.cjl')">
 					</el-table-column>
-					<el-table-column prop="deal_price" :label="$t('l.cjje')" >
+					<el-table-column prop="deal_price" :label="$t('l.cjje')">
 					</el-table-column>
-					<el-table-column prop="open_price" :label="$t('l.jcj')" >
+					<el-table-column prop="open_price" :label="$t('l.jcj')">
 					</el-table-column>
-					<el-table-column prop="hold_price" :label="$t('l.ccj')" >
+					<el-table-column prop="hold_price" :label="$t('l.ccj')">
 					</el-table-column>
 					<el-table-column prop="close_price" :label="$t('l.pcj')">
 					</el-table-column>
@@ -388,9 +397,9 @@
 					</el-table-column>
 					<el-table-column prop="overnight_fee" :label="$t('l.gysxf')">
 					</el-table-column>
-					<el-table-column  :label="$t('l.cjlx')">
+					<el-table-column :label="$t('l.cjlx')">
 						<template slot-scope="scope">
-							{{$t('l.deal_type')[scope.row.deal_type]}}
+							{{$t('l.deal_type['+scope.row.deal_type+']')}}
 						</template>
 					</el-table-column>
 				</el-table>

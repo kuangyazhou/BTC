@@ -5,6 +5,7 @@ const en = {
 	message: {
 		'cn': '中文',
 		'en': 'English',
+		'zh':'账号e',
 		'ln': 'Language',
 		'hello': 'hello world',
 		'login': 'Login',
@@ -23,6 +24,7 @@ const en = {
 	},
 	l: {
 		'aqkkdjypt': '安全可靠的交易平台e',
+	     'jy':'交易e',
 		'ln': 'English',
 		'login': 'Login',
 		'reg': 'Register',
@@ -163,7 +165,21 @@ const en = {
 			'0':'用户委托e',
 			'1':'系统强制平仓e',
 			'2':'后台强制平仓e'
-		}
+		},
+		'chedan':'撤单e',
+		'jiaoyi':'交易e',
+		'ts':'提示e',
+        'Msgwtcg':'委托成功e!',
+        'Msg1':'买入量/卖出量不得大于持仓数量e!',
+        'Msg2':'撤销订单成功e!',
+        'Msg3':'是否确认撤销该笔订单e?',
+        'Msg4':'卖出时止损价应大于止盈价e!',
+		'Msg5':'买入时止损价应小于止盈价e!'
+	},
+	order:{
+		ddh:'订单号e',
+		ddsj:'订单时间e',
+		xzrq:'选择日期e'
 	},
 	w: {
 		'gj': ' International',
@@ -232,7 +248,7 @@ const en = {
 		hyzdylbl: '会员最大盈利比率e: ',
 		'bc': 'Save',
 		'qx': 'Cancel',
-		'qr': 'Sure',
+		'qr': 'Confirm',
 		'sx': 'Refresh',
 		'jdc': '价点差e',
 		'msh': '免审核e',
