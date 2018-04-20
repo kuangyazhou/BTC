@@ -3,6 +3,7 @@ import {
   chargeList,
   chartDetail,
   collection,
+  collectionOnOff,
   collectionDel,
   collectionList,
   chargeUpdate,
@@ -11,6 +12,10 @@ import {
   collectionCreate,
   collectionUpdate
 } from '@/api/money';
+
+import {
+  notice
+} from '@/api/notice'
 
 const money = {
   state: {},
@@ -106,11 +111,29 @@ const money = {
         throw Error(err);
       })
     },
+    collectionOnOff({
+      commit
+    }, data) {
+      return collectionOnOff(data).then(response => {
+        return response;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
     collectionUpdate({
       commit
     }, data) {
       return collectionUpdate(data).then(response => {
         return response;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    notice({
+      commit
+    }, data) {
+      return notice(data).then(res => {
+        return res;
       }).catch(err => {
         throw Error(err);
       })

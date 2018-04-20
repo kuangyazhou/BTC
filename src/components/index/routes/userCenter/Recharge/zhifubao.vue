@@ -1,5 +1,5 @@
 <template>
-	<div class="wechat">
+	<div class="zhifubao">
 		<h4>选择线上支付通道：</h4>
 		<div class="pay_type">
 			<span v-for="(item,index) in payWay" :class="{'select':index==active}" @click="active=index" :key="index">
@@ -9,15 +9,18 @@
         	</span>
 		</div>
 		<h4>填写转账信息：</h4>
-		<div class="form">
-			<el-form ref="form" :model="form" label-width="120px" size="small" :rules="rules">
-				<el-form-item label="存入金额" prop="number">
-					<el-input v-model="form.number" type="number" ></el-input>
-				</el-form-item>
-				<el-form-item label="存款人账号" prop="name">
-					<el-input v-model="form.name" ></el-input>
-				</el-form-item>
-			</el-form>
+		<div class="content">
+			<div class="form">
+				<el-form ref="form" :model="form" label-width="120px" size="small" :rules="rules">
+					<el-form-item label="存入金额" prop="number">
+						<el-input v-model="form.number"></el-input>
+					</el-form-item>
+					<el-form-item label="存款人账号" prop="name">
+						<el-input v-model="form.name" ></el-input>
+					</el-form-item>
+				</el-form>
+			</div>
+
 		</div>
 		<div v-if="button" class="charImg">
 			<h3>充值金额：{{form.number}}</h3>
@@ -35,13 +38,13 @@
 	export default {
 		computed: {
 			payWay: function() {
-				return this.$store.state.user.rechargeWay['2']
+				return this.$store.state.user.rechargeWay['1']
 			}
 		},
 		data() {
 			return {
-				button: false,
 				active: 0,
+				button: false,
 				form: {
 					number: '',
 					name: ''
@@ -65,7 +68,6 @@
 		},
 		methods: {
 			charge() {
-				
 				const data = {
 					pay_way_id: this.payWay[this.active].id,
 					amount: this.form.number,
@@ -81,7 +83,6 @@
 						type: 'success',
 						message: '提交成功，请扫描二维码充值'
 					})
-					
 				}
 			}
 		}
@@ -89,7 +90,7 @@
 </script>
 
 <style lang="less" scoped>
-	.wechat {
+	.zhifubao {
 		position: relative;
 	}
 	
@@ -127,16 +128,16 @@
 			border: 1px dashed #cacaca;
 			cursor: pointer;
 			position: relative;
-			background: url(./img/rbank.png) no-repeat;
-			background-position: 10px -50px;
 			&.select,
 			&:hover {
 				border: 1px solid #ea3146;
 			}
 			.rbank-icon {
 				display: inline-block;
+				background: url(./img/rbank-icon.png) no-repeat;
 				width: 28px;
 				height: 28px;
+				background-position: 0 -128px;
 				vertical-align: middle;
 			}
 			.mark {

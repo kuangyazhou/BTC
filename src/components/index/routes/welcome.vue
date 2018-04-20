@@ -19,7 +19,6 @@
 						</span>
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item :command="index" v-for="(item,index) in coinArr" :key="index">{{item.name}}</el-dropdown-item>
-
 						</el-dropdown-menu>
 					</el-dropdown>
 				</div>

@@ -15,12 +15,13 @@
 						
 
 						<el-collapse v-model="activeName" accordion>
-						  <el-collapse-item title="交易记录" name="1">
+						  <el-collapse-item title="充提记录" name="1">
 						    
-						    <div>交易记录</div>
+						    <div @click="$router.push({'path':'/record'})">交易记录</div>
 						  </el-collapse-item>
 						  <el-collapse-item title="账户管理" name="2">
-						    <el-button @click="$router.push({'path':'/cardList'})">银行卡管理</el-button>
+						    <div @click="$router.push({'path':'/cardList'})">银行卡管理</div>
+						    <div >修改密码</div>
 						  </el-collapse-item>
 						
 						</el-collapse>
@@ -50,6 +51,7 @@
 		Row,
 		Col,
 		Collapse,
+		Message,
 		CollapseItem
 	} from "element-ui";
 	Vue.use(Carousel);

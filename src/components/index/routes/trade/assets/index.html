@@ -7,6 +7,7 @@
 			<el-button type="primary" class="login-button" @click="$router.push({'path':'/userlogin'})">{{$t('l.login')}}</el-button>
 			<el-button type="primary" class="login-button" @click="$router.push({'path':'/userReg'})">{{$t('l.reg')}}</el-button>
 		</div>
+
 		<div class="member-info" v-if="loginStatus">
 			<div class="head">
 				<span class="head-name">{{$t('l.hm')}}</span><img src="./img/member.png" />
@@ -106,12 +107,21 @@
 					</div>-->
 					<div class="goods-item">
 						<div class="name">BTC</div>
-						<div class="price">{{BTCPrice[0][2].toFixed(3)}}</div>
+						<div class="price">{{(BTCPrice[0][2]).toFixed(3)}}</div>
 						<div class="range">{{((BTCPrice[0][2] - BTCPrice[0][1]) / BTCPrice[0][1] * 100).toFixed(2)+'%' }}</div>
-						
+
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="member-info">
+			<div class="head">
+				<span class="head-name">{{$t('s.zxgg')}}</span><i class="el-icon-message" style="font-size: 21px;vertical-align: middle;padding-left: 5px;"> </i>
+			</div>
+			<ul class="noticeList">
+				<li v-for="(item,index) in noticeList">{{index+1+'. '}}{{ item.title}}</li>
+			</ul>
+			<el-button size="small" @click="$router.push({'path':'/userNotice'})">查看更多</el-button>
 		</div>
 	</div>
 	<div class="right-Content">
@@ -124,147 +134,150 @@
 				<template slot="title">
 					<span class="title">{{$t('l.ol')}}</span> <img class="head-icon" src="./img/online.png" />
 				</template>
-				<div class="mod_hd">
-					<span :class="{'cur':entrusted_type==1}" @click="changeType(1)">{{$t('l.xjjy')}}</span>
-					<span :class="{'cur':entrusted_type==0}" @click="changeType(0)">{{$t('l.scjy')}}</span>
-				</div>
-				<div class="mod_bd">
-					<div class="panel">
-						<div class="hd">
-							<span>{{$t('l.ky')}}</span>
-							<span class="buy_available">{{userInfo.avail_deposit_amount||0.00000}}</span>
-							<span>USDT</span>
-							<a @click="$router.push({'path':'/userCenter'})">{{$t('l.cb')}}</a>
-						</div>
-						<div class="bd">
-							<div class="input-text input-price" v-if="entrusted_type==1">
-								<div class="label">{{$t('l.mrj')}}</div>
-								<label>
-                     					<input type="text" maxlength="14" v-model="buyPrice"/>
+				<div class="tradeContent">
+					<countDown></countDown>
+					<div class="mod_hd">
+						<span :class="{'cur':entrusted_type==1}" @click="changeType(1)">{{$t('l.xjjy')}}</span>
+						<span :class="{'cur':entrusted_type==0}" @click="changeType(0)">{{$t('l.scjy')}}</span>
+					</div>
+					<div class="mod_bd">
+						<div class="panel">
+							<div class="hd">
+								<span>{{$t('l.ky')}}</span>
+								<span class="buy_available">{{userInfo.avail_deposit_amount||0.00000}}</span>
+								<span>USDT</span>
+								<a @click="$router.push({'path':'/userCenter'})">{{$t('l.cb')}}</a>
+							</div>
+							<div class="bd">
+								<div class="input-text input-price" v-if="entrusted_type==1">
+									<div class="label">{{$t('l.mrj')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="buyPrice" @input="buyPrice=buyPrice.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      			</label>
-								<div class="math-price">
-									≈ {{buyPrice*userInfo.exchange_rate||0.00000}} CNY
+									<div class="math-price">
+										≈ {{buyPrice*userInfo.exchange_rate||0.00}} CNY
+									</div>
 								</div>
-							</div>
-							<div class="input-text  input-price" v-if="entrusted_type==0">
-								<div class="label">{{$t('l.mrj')}}</div>
-								<label>
+								<div class="input-text  input-price" v-if="entrusted_type==0">
+									<div class="label">{{$t('l.mrj')}}</div>
+									<label>
                      					<input type="text" disabled="disabled" :placeholder="$t('l.ysczyjgmr')"/>
                      					<span>USDT</span>
                      				</label>
 
-							</div>
-							<div class="input-text price-limit">
-								<div class="">
-									<div class="label">{{$t('l.zsj')}}</div>
-									<label>
-	                     					<input type="text" maxlength="14" v-model="buy_loss_limit"/>
+								</div>
+								<div class="input-text price-limit">
+									<div class="">
+										<div class="label">{{$t('l.zsj')}}</div>
+										<label>
+	                     					<input type="text" maxlength="14" v-model="buy_loss_limit" @input="buy_loss_limit=buy_loss_limit.replace(/[^0-9.]/g, '')"/>
 	                     					
 	                     				</label>
-								</div>
-								<div class="">
-									<div class="label">{{$t('l.zyj')}}</div>
-									<label>
-	                     					<input type="text" maxlength="14" v-model="buy_profit_limit"/>
+									</div>
+									<div class="">
+										<div class="label">{{$t('l.zyj')}}</div>
+										<label>
+	                     					<input type="text" maxlength="14" v-model="buy_profit_limit" @input="buy_profit_limit=buy_profit_limit.replace(/[^0-9.]/g, '')"/>
 	                     				
 	                     			</label>
+									</div>
 								</div>
-							</div>
-							<div class="input-text" v-if="entrusted_type==0">
-								<div class="label">{{$t('ar.bjdc')}}</div>
-								<label>
-                     					<input type="text" maxlength="14" v-model="buyRange"/>
+								<div class="input-text" v-if="entrusted_type==0">
+									<div class="label">{{$t('ar.bjdc')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="buyRange" @input="buyRange=buyRange.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      			</label>
 
-							</div>
-							<div class="input-text">
-								<div class="label">{{$t('l.mrl')}}</div>
-								<label>
-                     					<input type="text" maxlength="14" v-model="buyNum"/>
+								</div>
+								<div class="input-text">
+									<div class="label">{{$t('l.mrl')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="buyNum" @input="buyNum=buyNum.replace(/[^0-9.]/g, '')"/>
                      					<span>BTC</span>
                      			</label>
 
-							</div>
-							<div class="account-range">
-								<span class="min">{{$t('ar.sxf')}} {{buyPrice*buyNum*userInfo.open_fee_percentage/100||0.000}} USDT</span>
-								<!--<span class="max">0.0000 USDT</span>-->
-								<div class="total" v-if="entrusted_type==1">
-									{{$t('l.jye')}} {{buyPrice*buyNum}} USDT
 								</div>
+								<div class="account-range">
+									<span class="min">{{$t('ar.sxf')}} {{(buyPrice*buyNum*userInfo.open_fee_percentage/100||0.00).toFixed(2)}} USDT</span>
+									<!--<span class="max">0.0000 USDT</span>-->
+									<div class="total" v-if="entrusted_type==1">
+										{{$t('l.jye')}} {{(buyPrice*buyNum).toFixed(2)}} USDT
+									</div>
+								</div>
+								<el-button class="submit btn_buy" :disabled="canBuy" @click="order(1)">
+									{{$t('l.mr')}}BTC
+								</el-button>
 							</div>
-							<el-button class="submit btn_buy" :disabled="canBuy" @click="order(1)">
-								{{$t('l.mr')}}BTC
-							</el-button>
 						</div>
-					</div>
-					<div class="panel">
-						<div class="hd">
+						<div class="panel">
+							<div class="hd">
 
-						</div>
-						<div class="bd">
-							<div class="input-text input-price" v-if="entrusted_type==1">
-								<div class="label">{{$t('l.mcj')}}</div>
-								<label>
-                     					<input type="text" maxlength="14" v-model="sellPrice"/>
+							</div>
+							<div class="bd">
+								<div class="input-text input-price" v-if="entrusted_type==1">
+									<div class="label">{{$t('l.mcj')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="sellPrice" @input="sellPrice=sellPrice.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      			</label>
-								<div class="math-price">
-									≈ {{sellPrice*userInfo.exchange_rate||0.00000}} CNY
+									<div class="math-price">
+										≈ {{sellPrice*userInfo.exchange_rate||0.00000}} CNY
+									</div>
 								</div>
-							</div>
-							<div class="input-text  input-price" v-if="entrusted_type==0">
-								<div class="label">{{$t('l.mcj')}}</div>
-								<label>
+								<div class="input-text  input-price" v-if="entrusted_type==0">
+									<div class="label">{{$t('l.mcj')}}</div>
+									<label>
                      					<input type="text" disabled="disabled" :placeholder="$t('l.ysczyjgmc')" />
                      					<span>USDT</span>
                      			</label>
 
-							</div>
-							<div class="input-text price-limit">
-								<div class="">
-									<div class="label">{{$t('l.zsj')}}</div>
-									<label>
-	                     					<input type="text" maxlength="14" v-model="sell_loss_limit"/>
+								</div>
+								<div class="input-text price-limit">
+									<div class="">
+										<div class="label">{{$t('l.zsj')}}</div>
+										<label>
+	                     					<input type="text" maxlength="14" v-model="sell_loss_limit" @input="sell_loss_limit=sell_loss_limit.replace(/[^0-9.]/g, '')"/>
 	                     					
 	                     			</label>
-								</div>
-								<div class="">
-									<div class="label">{{$t('l.zyj')}}</div>
-									<label>
-	                     					<input type="text" maxlength="14" v-model="sell_profit_limit"/>
+									</div>
+									<div class="">
+										<div class="label">{{$t('l.zyj')}}</div>
+										<label>
+	                     					<input type="text" maxlength="14" v-model="sell_profit_limit" @input="sell_profit_limit=sell_profit_limit.replace(/[^0-9.]/g, '')"/>
 	                     				
 	                     			</label>
+									</div>
 								</div>
-							</div>
-							<div class="input-text" v-if="entrusted_type==0">
-								<div class="label">{{$t('ar.bjdc')}}</div>
-								<label>
-                     					<input type="text" maxlength="14" v-model="sellRange"/>
+								<div class="input-text" v-if="entrusted_type==0">
+									<div class="label">{{$t('ar.bjdc')}}</div>
+									<label>
+                     					<input type="text" maxlength="14" v-model="sellRange" @input="sellRange=sellRange.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      			</label>
 
-							</div>
-							<div class="input-text">
-								<div class="label">{{$t('l.mcl')}}</div>
-								<label>
-										<input type="text" maxlength="14" v-model="sellNum" />
+								</div>
+								<div class="input-text">
+									<div class="label">{{$t('l.mcl')}}</div>
+									<label>
+										<input type="text" maxlength="14" v-model="sellNum" @input="sellNum=sellNum.replace(/[^0-9.]/g, '')"/>
                      					<span>BTC</span>
                      		    </label>
 
-							</div>
-
-							<div class="account-range">
-								<span class="min">{{$t('ar.sxf')}} {{sellPrice*sellNum*userInfo.open_fee_percentage/100||0.000}} USDT</span>
-								<!--<span class="max">0.0000 USDT</span>-->
-								<div class="total" v-if="entrusted_type==1">
-									{{$t('l.jye')}} {{sellPrice*sellNum}} USDT
 								</div>
+
+								<div class="account-range">
+									<span class="min">{{$t('ar.sxf')}} {{(sellPrice*sellNum*userInfo.open_fee_percentage/100||0.000).toFixed(2)}} USDT</span>
+									<!--<span class="max">0.0000 USDT</span>-->
+									<div class="total" v-if="entrusted_type==1">
+										{{$t('l.jye')}} {{(sellPrice*sellNum).toFixed(2)}} USDT
+									</div>
+								</div>
+								<el-button class="submit btn_sell" :disabled="canSell" @click="order(-1)">
+									{{$t('l.mc')}}BTC
+								</el-button>
 							</div>
-							<el-button class="submit btn_sell" :disabled="canSell" @click="order(-1)">
-								{{$t('l.mc')}}BTC
-							</el-button>
 						</div>
 					</div>
 				</div>
@@ -310,7 +323,7 @@
 					</el-table-column>
 					<el-table-column :label="$t('ar.cz')" v-if="canUndo" fixed="right">
 						<template slot-scope="scope">
-							<el-button @click="undoClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1">{{$t('l.chedan')}}</el-button>
+							<el-button @click="undoClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&countDown==''">{{$t('l.chedan')}}</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -353,9 +366,9 @@
 							{{($t('l.hold_order_status['+scope.row.order_status+']'))}}
 						</template>
 					</el-table-column>
-					<el-table-column :label="$t('ar.cz')" fixed="right">
+					<el-table-column :label="$t('ar.cz')">
 						<template slot-scope="scope">
-							<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1">{{$t('ar.pc')}}</el-button>
+							<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&countDown==''">{{$t('ar.pc')}}</el-button>
 						</template>
 					</el-table-column>
 				</el-table>

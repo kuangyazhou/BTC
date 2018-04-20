@@ -32,18 +32,31 @@ Vue.filter('percentage', pen);
 
 router.beforeEach((to, from, next) => {
 	let token = loadToken();
-
+	let a = router.history.current.meta.member || false;
 	if(to.matched.some(record => record.meta.requiresAuth)) {
-		if(!token && !store.state.user.loginByAccount) {
-			// location.replace(`/login`)
 
-			next({
-				path: '/login',
-				query: {
-					redirect: to.fullPath
+		if(!token) {
+			// location.replace(`/login`)
+			if(!a) {
+				next({
+					path: '/login',
+					query: {
+						redirect: to.fullPath
+					}
+				})
+			} else {
+				if(router.history.current.name != 'Trade') {
+					next({
+						path: '/',
+						query: {
+							redirect: to.fullPath
+						}
+					})
 				}
-			})
-		} else{
+
+			}
+
+		} else {
 			next()
 		}
 	} else {

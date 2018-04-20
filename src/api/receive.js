@@ -20,11 +20,12 @@ export function memberNet(data) {
     user_id = '',
       account = '',
       ofield = '',
-      sort = 'asc'
+      sort = 'desc',
+      page = 1
   } = data;
   return request({
     method: 'get',
-    url: `/index.php?r=btc/received/get-holds&user_id=${user_id}&account=${account}&ofield=${ofield}&byfield=${sort}`
+    url: `/index.php?r=btc/received/get-holds&user_id=${user_id}&account=${account}&ofield=${ofield}&byfield=${sort}&page=${page}`
   })
 }
 
@@ -57,10 +58,11 @@ export function memberDeal(data) {
     type = 0,
       account = '',
       ordernum = '',
+      page = 1
   } = data;
   return request({
     method: 'get',
-    url: `/index.php?r=btc/received/get-order-deals&otype=${type}&account=${account}&ordernum=${ordernum}`,
+    url: `/index.php?r=btc/received/get-order-deals&otype=${type}&account=${account}&ordernum=${ordernum}&page=${page}`,
   })
 }
 
@@ -71,11 +73,12 @@ export function netSearch(data) {
     type = '',
       account = '',
       ordernum = '',
-      otype = ''
+      otype = '',
+      page = 1
   } = data;
   return request({
     method: 'get',
-    url: `/index.php?r=btc/received/get-order-hold-type&type=${type}&account=${account}&ordernum=${ordernum}&otype=${otype}`
+    url: `/index.php?r=btc/received/get-order-hold-type&type=${type}&account=${account}&ordernum=${ordernum}&otype=${otype}&page=${page}`
   })
 }
 
@@ -86,15 +89,16 @@ export function entrust(data) {
   const {
     size = 0,
       ofield = 'ep',
-      sort = 'asc',
+      sort = 'desc',
       ordernum = '',
       account = '',
       etype = '',
-      otype = ''
+      otype = '',
+      page = 1
   } = data;
   return request({
     method: "get",
-    url: `/index.php?r=btc/received/get-review-entrusteds&rnum_size=${size}&ofield=${ofield}&byfield=${sort}&account=${account}&ordernum=${ordernum}&etype=${etype}&otype=${otype}`
+    url: `/index.php?r=btc/received/get-review-entrusteds&rnum_size=${size}&ofield=${ofield}&byfield=${sort}&account=${account}&ordernum=${ordernum}&etype=${etype}&otype=${otype}&page=${page}`
   })
 }
 
@@ -119,7 +123,6 @@ export function forceClose(data) {
 }
 
 //审核
-
 // order_id 订单id
 // entrusted_price 委托价格
 // entrust_number 委托数量
@@ -129,5 +132,14 @@ export function review(data) {
     data,
     method: 'post',
     url: '/index.php?r=btc/order/review-entrust-order'
+  })
+}
+
+//补仓操作
+export function rapl(data) {
+  return request({
+    data,
+    method: 'post',
+    url: 'index.php?r=btc/received/member-repair'
   })
 }

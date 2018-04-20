@@ -1,5 +1,6 @@
 <template>
   <div style="height:100%;">
+  	<Notice ref="notice"></Notice>
     <BHeader></BHeader>
     <el-row :gutter="10" class="body">
       <el-col :span="3" style="height:100%;padding-right:0px">
@@ -25,20 +26,36 @@ Vue.use(Col);
 import SideBar from "@/components/SideBar";
 import BHeader from "@/components/Header";
 import BFooter from "@/components/Footer";
+import Notice from "@/components/common/dialog-notice";
 
 export default {
   name: "Home",
-  components: { SideBar, BHeader, BFooter },
+  components: { SideBar, BHeader, BFooter ,Notice},
   // props: {
   //   active: {
   //     type: String,
   //     default: "account"
   //   }
   // },
-  watch: {},
-  computed: {},
+  watch: {
+  	loginStatus: function(val) {
+  	    
+		}	
+  },
+  computed: {
+  	loginStatus: function() {
+				return this.$store.state.user.userInfo 
+		}
+  },
   created() {},
-  mounted() {},
+  mounted() {
+  		if(this.$store.state.user.token&&this.$store.state.user.userInfo.my_notice.length>0){
+  			setTimeout(() => {
+							this.$refs.notice.dialogVisible = true;
+						}, 1000)
+  		}
+  	  
+  },
   updated() {},
   activated() {},
   methods: {

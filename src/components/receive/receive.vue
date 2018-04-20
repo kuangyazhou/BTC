@@ -9,7 +9,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="4">
-            <el-form-item v-show="receiveItem==='deal'||receiveItem==='net_cash'||receiveItem==='net_credit'" label="成交单号" prop="order_num">
+            <!-- ||receiveItem==='net_cash'||receiveItem==='net_credit' -->
+            <el-form-item v-show="receiveItem==='deal'" label="成交单号" prop="order_num">
               <el-input v-model="formReceive.order_num"></el-input>
             </el-form-item>
           </el-col>
@@ -32,7 +33,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item v-show="receiveItem!='member'" label="建仓平仓" prop="order_type">
+            <el-form-item v-show="receiveItem!='member'&receiveItem!='net_cash'&receiveItem!='net_credit'" label="建仓平仓" prop="order_type">
               <!-- <el-input></el-input> -->
               <el-select v-model="formReceive.order_type">
                 <el-option v-for="item in houseType" :key="item.label" :label="item.label" :value="item.value"></el-option>
@@ -205,7 +206,7 @@ export default {
           break;
         case "audit":
           this.$refs.tables.initAudit({
-            size: 0,
+            size: 1,
             ordernum: this.formReceive.auth_num,
             account: this.formReceive.account,
             etype: this.formReceive.auth_type,

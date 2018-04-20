@@ -30,15 +30,19 @@ Vue.use(DropdownItem);
 Vue.use(Dialog);
 import axios from 'axios'
 import closeOut from '../../closeOut.vue'
+import countDown from '../../countDown.vue' //熔断倒计时
 import kl_echarts from './echarts.vue'
 import DATA from './DATA.js'
 import { getUserInfo } from "@/utils/apiUtils";
+
 export default {
 	components: {
 		kl_echarts,
-		closeOut
+		closeOut,
+		countDown
 	},
 	mounted() {
+
 		this.lg = localStorage.getItem("lang");
 		this.$i18n.locale = this.lg; //设置语言
 		//this.getProductInfo();
@@ -51,7 +55,7 @@ export default {
 				this.getInfo();
 			}, 10000)
 		}
-
+		this.getNotice()
 		//console.log(this.userInfo)
 	},
 	beforeDestroy() {
@@ -72,7 +76,9 @@ export default {
 	},
 
 	computed: {
-
+		countDown: function() {
+				return this.$store.state.user.countDown
+		},
 		loginStatus: function() {
 
 			return this.$store.state.user.userInfo || getUserInfo()
@@ -123,12 +129,25 @@ export default {
 				price: 0.100556666,
 				range: '-12%'
 			}],
+			noticeList:[],
 			my_orders: {
 
 			}
 		}
 	},
 	methods: {
+		//获取公告
+		async getNotice(){
+			 const res = await DATA.getNotice();
+			 this.noticeList = res.data.notice_list;
+			 //接受熔断倒计时
+		
+			  let countDown = res.data.circular_brake;
+			  this.$store.commit('getCountDown', countDown);
+					
+              console.log(countDown)
+
+		},
 		//限价交易和市场交易切换
 		changeType(a) {
 			this.entrusted_type = a;
@@ -158,6 +177,7 @@ export default {
 					this.entrusted_price = this.newBuyPrice;
 					this.accept_change_range = this.buyRange;
 				}
+				
 				if(this.buy_profit_limit && this.buy_loss_limit && this.buy_profit_limit <= this.buy_loss_limit) {
 					Message({
 						message: this.$t('l.Msg5'),
@@ -183,6 +203,13 @@ export default {
 					});
 					return;
 				}
+			}
+			if(this.entrusted_number<=0||!this.entrusted_number){
+				Message({
+						message: this.$t('l.Msg6'),
+						type: 'warning'
+					});
+					return;
 			}
 			this.sendOrder();
 		},
@@ -277,6 +304,7 @@ export default {
 			if(res.data&&this.loginStatus) {
 				this.userInfo = res.data;
 				this.userInfo.open_order_sale = 0;
+				this.noticeList = res.data.notice_list;
 				this.my_orders = res.data.my_orders;
 				this.canBuy = this.userInfo.user_privileges.open_order_buy == 1 ? false : true,
 					this.canSell = this.userInfo.user_privileges.open_order_sale == 1 ? false : true,
@@ -308,7 +336,8 @@ export default {
 		},
 		handleChange(val) {
 			//console.log(val);
-		}
+		},
+	
 
 	}
 }

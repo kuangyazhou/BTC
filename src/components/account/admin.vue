@@ -1,7 +1,7 @@
 <template>
   <div class="account-admin">
     <el-dialog title="新增管理员" :visible="openItem=='add'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
-      <el-form ref="adminForm" :model="adminForm" label-width="80px" :inline="true" size="mini" :rules="rules" label-position="right">
+      <el-form ref="adminForm" key="form2" :model="adminForm" label-width="80px" :inline="true" size="mini" :rules="rules" label-position="right">
         <el-row>
           <el-col :span="8">
             <el-form-item label="登录帐号" prop="account">
@@ -13,14 +13,6 @@
               <el-input v-model="adminForm.name" name="user_name"></el-input>
             </el-form-item>
           </el-col>
-          <!-- <el-col :span="8">
-            <el-form-item label="帐号状态" prop="status">
-              <el-select size="mini" v-model="adminForm.status">
-                <el-option v-for="item in status" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="8">
@@ -38,7 +30,7 @@
           <el-col>
             <el-form-item label="权限" prop="auths">
               <el-checkbox-group v-model="adminForm.auths" :min="1" @change="authChange" name="auths">
-                <el-checkbox v-for="item in auth" :label="item.value" :key="item.value">{{item.label}}</el-checkbox>
+                <el-checkbox v-for="item in auth" :label="item.value" v-if="item.show" :key="item.value">{{item.label}}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-col>
@@ -50,24 +42,11 @@
       </span>
     </el-dialog>
     <el-dialog title="基本信息修改" :visible="openItem=='update'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
-      <el-form ref="adminForm" :model="adminForm" label-width="80px" :inline="true" size="mini" :rules="rules" label-position="right">
+      <el-form ref="adminForm" key="form1" :model="adminForm" label-width="80px" :inline="true" size="mini" :rules="rules" label-position="right">
         <el-row>
-          <!-- <el-col :span="8">
-            <el-form-item label="登录帐号" prop="account">
-              <el-input v-model="adminForm.account" name="account" :disabled="true"></el-input>
-            </el-form-item>
-          </el-col> -->
           <el-col :span="8">
             <el-form-item label="帐号名称" prop="name">
               <el-input v-model="adminForm.name" name="user_name"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="帐号状态" prop="status">
-              <el-select size="mini" v-model="adminForm.status">
-                <el-option v-for="item in status" :key="item.value" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -87,7 +66,7 @@
           <el-col>
             <el-form-item :label="$t('message.auth')" prop="auths">
               <el-checkbox-group v-model="adminForm.auths" :min="1" @change="authChange" name="auths">
-                <el-checkbox v-for="item in auth" :label="item.value" :key="item.value">{{item.label}}</el-checkbox>
+                <el-checkbox v-for="item in auth" :label="item.value" :key="item.value" v-if="item.show">{{item.label}}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-col>
@@ -98,21 +77,6 @@
         <el-button size="mini" type="primary" native-type="submit" @click="addSubmit">{{$t('message.confirm')}}</el-button>
       </span>
     </el-dialog>
-    <!-- <el-dialog title="密码重置" :visible="openItem=='pwd'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
-      <span>pwd</span>
-      <span slot="footer" class="dialog-footer">
-      </span>
-    </el-dialog> -->
-    <!-- <el-dialog title="角色分配" :visible="openItem=='role'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
-      <span>role</span>
-      <span slot="footer" class="dialog-footer">
-      </span>
-    </el-dialog> -->
-    <!-- <el-dialog title="详细信息" :visible="openItem=='detail'" :before-close="close" :close-on-press-escape="false" :close-on-click-modal="false">
-      <span>detail</span>
-      <span slot="footer" class="dialog-footer">
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 
@@ -152,7 +116,7 @@ export default {
       switch (val) {
         case "add":
           this.$store.dispatch("addAdmin", {}).then(res => {});
-          this.$refs.adminForm.resetFields();
+        // Object.assign(this.adminForm, this.initial);
         case "detail":
           break;
         case "role":
@@ -173,6 +137,15 @@ export default {
     }
   },
   data() {
+    const initial = {
+      account: "",
+      name: "",
+      user_id: "",
+      status: "",
+      password: "",
+      repassword: "",
+      auths: []
+    };
     return {
       dialogVisible: true,
       status: [
@@ -180,12 +153,12 @@ export default {
         { label: this.$t("message.forbidden"), value: 0 }
       ],
       auth: [
-        { label: this.$t("message.zhgl"), value: "zhgl" },
-        { label: this.$t("message.cssz"), value: "cssz" },
-        { label: this.$t("message.sftj"), value: "sftj" },
-        { label: this.$t("message.bbgl"), value: "bbgl" },
-        { label: this.$t("message.gggl"), value: "gggl" },
-        { label: this.$t("message.zjgl"), value: "zjgl" }
+        // { label: this.$t("message.zhgl"), value: "zhgl", show: true },
+        // { label: this.$t("message.cssz"), value: "cssz", show: true },
+        // { label: this.$t("message.sftj"), value: "sftj", show: true },
+        // { label: this.$t("message.bbgl"), value: "bbgl", show: true },
+        // { label: this.$t("message.gggl"), value: "gggl", show: true },
+        // { label: this.$t("message.zjgl"), value: "zjgl", show: this.level == 0 }
       ],
       adminForm: {
         account: "",
@@ -226,18 +199,37 @@ export default {
       }
     }
   },
-  created() {},
+  computed: {
+    level() {
+      return (
+        this.$store.state.user.level ||
+        JSON.parse(sessionStorage.getItem("user")).level
+      );
+    }
+  },
+  created() {
+    this.auth = [
+      { label: this.$t("message.zhgl"), value: "zhgl", show: true },
+      { label: this.$t("message.cssz"), value: "cssz", show: true },
+      { label: this.$t("message.sftj"), value: "sftj", show: true },
+      { label: this.$t("message.bbgl"), value: "bbgl", show: true },
+      { label: this.$t("message.gggl"), value: "gggl", show: true },
+      {
+        label: this.$t("message.zjgl"),
+        value: "zjgl",
+        show: Number(this.level) == 0
+      }
+    ];
+  },
   mounted() {
-    // setTimeout(() => {
-    //   this.$emit("adminClose", "add");
-    // }, 3000);
+    // console.log(this.level==0,this.auth);
   },
   methods: {
     authChange(e) {
       // console.log(e);
     },
     addSubmit() {
-      // console.log(this.adminForm);
+      console.log(this.adminForm.auths);
       const arg = {
         user_id: this.adminItem.id || "",
         account: this.adminForm.account || this.adminItem.account,
@@ -257,6 +249,7 @@ export default {
                 duration: 1800,
                 message: this.$t("message.saveSuccess"),
                 onClose: () => {
+                  this.$refs["adminForm"].resetFields();
                   this.$emit("adminClose", "", true);
                 }
               });
@@ -272,7 +265,8 @@ export default {
         }
       });
     },
-    close() {
+    close(e) {
+      this.$refs["adminForm"].resetFields();
       this.$emit("adminClose", "");
       // this.$emit("update:openItem", ""); //.sync使用失败
     }

@@ -174,7 +174,8 @@ const en = {
         'Msg2':'撤销订单成功e!',
         'Msg3':'是否确认撤销该笔订单e?',
         'Msg4':'卖出时止损价应大于止盈价e!',
-		'Msg5':'买入时止损价应小于止盈价e!'
+		'Msg5':'买入时止损价应小于止盈价e!',
+		'Msg6': '买入/卖出数量不合法e!'
 	},
 	order:{
 		ddh:'订单号e',
@@ -209,7 +210,8 @@ const en = {
 		'bjdc': '报价点差 e',
 		'shsz': '审核设置e',
 		'hlsz': '汇率设置e',
-		'zdchl': '最大吃货量e',
+		'dbzdmchl':'单笔最大买持货量e',
+        'zdchl': '最大持货量e',
 		'jt': '阶梯e',
 		'xg': '修改e',
 		'jgfd': '价格浮动e',
@@ -231,7 +233,7 @@ const en = {
 		'sxfsf': '手续费算法e',
 		'dbmrjcsxf': '单笔默认建仓手续费e',
 		'jcsxf': '建仓手续费e',
-		'sx': '上限e',
+		'shangxian': '上限e',
 		'dbmrpcsxf': '单笔默认平仓手续费e',
 		'pcsxf': '平仓手续费e',
 		'sqfs': '收取方式e',

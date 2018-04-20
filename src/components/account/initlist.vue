@@ -3,7 +3,7 @@
     <el-row style="margin-bottom:0.5em">
       <el-col>
         <el-radio-group v-model="proxy" size="small" @change="change">
-          <el-radio-button v-for="(item,index) in levelNum" v-bind:key="index" :label="item.level">
+          <el-radio-button v-for="(item,index) in levelNum" v-if="sub==0||index!=0" v-bind:key="index" :label="item.level">
             <span>{{item.label}}</span>
             <span>{{item.value}}</span>
           </el-radio-button>
@@ -17,16 +17,19 @@
           <el-table :border="false" size="mini" :data="oneData" style="width: 100%" v-loading="loading" :element-loading-text="$t('message.loading')" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0.2, 0.2, 0.2, 0.8)">
             <el-table-column type="index" align="center">
             </el-table-column>
-            <el-table-column prop="name" align="center" :label="title+'代理名称'">
+            <el-table-column prop="name" align="center" :label="title+'名称'">
               <template slot-scope="scope">
                 <span @click="viewUser(scope.row)" style="cursor: pointer;">
                   {{scope.row.name}}
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="account" align="center" :label="title+'代理帐号'">
+            <el-table-column prop="account" align="center" :label="title+'帐号'">
             </el-table-column>
-            <el-table-column prop="limit" align="center" label="信用额度" width="80">
+            <el-table-column key="abc" prop="limit" align="center" label="信用额度" width="80">
+              <template slot-scope="scope">
+                <span>{{scope.row.type=='1'?'-':scope.row.limit}}</span>
+              </template>
             </el-table-column>
             <el-table-column prop="account_type" align="center" label="帐户类型" width="80">
               <template slot-scope="scope">
@@ -73,6 +76,7 @@
             <el-table-column v-if="showMember" prop="member" align="center" :label="$t('message.member')" width="50">
               <template slot-scope="scope">
                 <span @click="viewNext(scope.row,6,scope.row.member)" v-bind:class="{cursor:scope.row.member>0}">{{scope.row.member}}</span>
+                <!-- {{scope.row.member}} -->
               </template>
             </el-table-column>
             <el-table-column prop="frozen" align="center" :label="$t('message.crashFrozen')">
@@ -136,11 +140,11 @@
                     <i class="fa fa-chevron-down"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command='detail'>{{$t('message.detail')}}</el-dropdown-item>
+                    <!-- <el-dropdown-item command='detail'>{{$t('message.detail')}}</el-dropdown-item> -->
                     <el-dropdown-item command='stop' v-if="scope.row.status=='1'">{{$t('message.noUse')}}</el-dropdown-item>
                     <el-dropdown-item command='use' v-if="scope.row.status=='0'">{{$t('message.using')}}</el-dropdown-item>
                     <el-dropdown-item command='delete'>{{$t('message.del')}}</el-dropdown-item>
-                    <el-dropdown-item command='role'>{{$t('message.roleAssign')}}</el-dropdown-item>
+                    <!-- <el-dropdown-item command='role'>{{$t('message.roleAssign')}}</el-dropdown-item> -->
                     <!-- <el-dropdown-item command='pwd'>{{$t('message.modifyPwd')}}</el-dropdown-item> -->
                     <el-dropdown-item command='update'>{{$t('message.modifyBaseInfo')}}</el-dropdown-item>
                   </el-dropdown-menu>
@@ -164,6 +168,8 @@
 
 <script>
 import Vue from "vue";
+import { getUserInfo } from "@/utils/apiUtils";
+
 import {
   Button,
   Row,
@@ -228,6 +234,11 @@ export default {
       type: Boolean
     }
   },
+  computed: {
+    sub() {
+      return this.$store.state.user.sub || getUserInfo().sub_admin;
+    }
+  },
   created() {
     let arg = {
       level: this.level + 1
@@ -240,7 +251,7 @@ export default {
     //   console.log(pre, cur, index, arr);
     //   return pre * cur;
     // }, 3);
-    // console.log(this.level);
+    // console.log(this.sub);
   },
   methods: {
     // 用户列表操作事件
@@ -286,6 +297,7 @@ export default {
     },
     viewUser(e) {
       // console.log(e.id, e.account);
+      if (e.level == 6) return;
       this.$emit("parentId", e.id, Number(e.level) + 1);
       let arg = {
         parent_id: e.id,
@@ -357,7 +369,7 @@ export default {
             this.oneData.push({
               name: item.name,
               account: item.account,
-              limit: item.credit,
+              limit: item.credit > 0 ? item.credit : "-",
               one: item.first_agent
                 ? item.first_agent.account
                   ? `<div>${item.first_agent.account}</div><div>${

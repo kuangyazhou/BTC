@@ -5,9 +5,9 @@
     <!-- 管理员功能模块 -->
     <Admin :openItem="openItem" :adminItem="adminItem" @adminClose="adminClose"></Admin>
     <!-- 初始化数据模块 -->
-    <InitList ref='list' :level="level" :viewLevel.sync="viewLevel" :adminList="adminList" @userHandle="operate" @parentId="setParent" @currentLevel="currentLevel" @adminHandle="adminHandle"></InitList>
+    <InitList ref='list' :title="title" :level="level" :viewLevel.sync="viewLevel" :adminList="adminList" @userHandle="operate" @parentId="setParent" @currentLevel="currentLevel" @adminHandle="adminHandle"></InitList>
     <!-- form表单弹框 -->
-    <AccountDialog ref="dialog" :title="title" :level="level" :viewLevel="viewLevel" :preList="preList" :showType="showType" :status="status" :visible="dialogVisible" :proxyOn="onProxySwitch" @dialogClose="dialogClose" @proxyClose="proxyClose" @initList="initList"></AccountDialog>
+    <AccountDialog ref="dialog" :title="title" :level="level" :viewLevel="viewLevel" :preList.sync="preList" :showType="showType" :status="status" :visible="dialogVisible" :proxyOn="onProxySwitch" :readonly="readonly" @dialogClose="dialogClose" @proxyClose="proxyClose" @initList="initList"></AccountDialog>
   </div>
 </template>
 
@@ -33,6 +33,7 @@ export default {
       viewLevel: this.level,
       preList: [],
       parent_id: "",
+      readonly: true,
       openItem: "",
       adminItem: {},
       adminList: false,
@@ -51,8 +52,8 @@ export default {
   computed: {
     level() {
       return (
-        this.$store.state.user.level ||
-        JSON.parse(sessionStorage.getItem("user")).level
+        Number(this.$store.state.user.level) ||
+        Number(JSON.parse(sessionStorage.getItem("user")).level)
       );
     }
   },
@@ -75,9 +76,11 @@ export default {
       const data = {
         level: this.viewLevel
       };
+      // console.log(data);
       switch (e) {
         case "update":
           this.showType = false;
+          if (this.level == 0) this.readonly = false;
           this.status = this.$t("message.modify");
           // console.log(this.$t());
           this.dialogVisible = true;
@@ -96,9 +99,11 @@ export default {
                 center: true,
                 message: this.$t("message.operateSuccess"),
                 type: "success",
-                duration: 1500
+                duration: 1500,
+                onClose: () => {
+                  this.$refs.list.init(data);
+                }
               });
-              this.$refs.list.init(data);
             }
           });
           break;
@@ -215,9 +220,9 @@ export default {
     },
 
     setParent(id, level) {
-      // console.log(e);
       this.parent_id = id;
       this.viewLevel = level;
+      this.title = this.mapData[level];
     },
     adminClose(e, reload) {
       this.openItem = e || "";
@@ -227,12 +232,17 @@ export default {
     // 搜索框新增按钮
     add() {
       this.showType = true;
+      if (this.level == 0) this.readonly = false;
       this.status = this.$t("message.addNew");
       if (this.viewLevel - this.level >= 2 && this.parent_id == "") {
         const pre = this.viewLevel;
         this.$store.dispatch("PRELIST", { pre: pre }).then(res => {
           if (res.data.status == 1) {
             this.preList = res.data.data;
+            // 一级代理,二级代理排序
+            this.preList = this.preList.sort((a, b) => {
+              return a.level - b.level;
+            });
           }
         });
         this.onProxySwitch = true;

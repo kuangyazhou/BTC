@@ -3,17 +3,19 @@
 		<div class="head">
 			请选择银行入款卡号
 		</div>
-		<div class="cardInfo" @click="sendId=cardId" :class="{'select':sendId==cardId}">
-			<div class="icon">
+		<div class="body">
 
+			<div class="cardInfo" @click="selectId=index" v-for="(cardInfo,index) in payWay" :class="{'select':selectId==index}" :key="index">
+				<div class="icon">
+
+				</div>
+				<ul class="">
+					<li>开户银行：{{cardInfo.pay_name}}</li>
+					<li>收款账户：{{cardInfo.pay_account}}</li>
+					<li>收款人：{{cardInfo.pay_user_name}}</li>
+					<i class="mark" v-if="selectId==index"></i>
+				</ul>
 			</div>
-			<ul class="">
-				<li>开户银行：{{cardInfo.bank_name}}</li>
-				<li>开户网点：{{cardInfo.banking_outlets}}</li>
-				<li>收款账户：{{cardInfo.user_account}}</li>
-				<li>收款人：{{cardInfo.user_name}}</li>
-				<i class="mark" v-if="sendId==cardId"></i>
-			</ul>
 		</div>
 		<el-button @click="next">下一步</el-button>
 		<div class="notice">
@@ -28,34 +30,32 @@
 <script>
 	import DATA from '../DATA.js'
 	export default {
+		computed: {
+			payWay: function() {
+				return this.$store.state.user.rechargeWay['3']
+			}
+		},
 		data() {
 			return {
-				cardInfo: {
-
-				},
-				sendId:'',
-				cardId:null
+				sendId: '',
+			    selectId: 0
 			}
 		},
 		mounted() {
-			this.getCard()
+	
 		},
 		methods: {
 			next() {
 				this.$router.push({
 					'path': '/pay2',
-					 'query':{
-					 	bank_name:this.cardInfo.bank_name,
-					 	id:this.sendId
-					 } 
+					'query': {
+						bank_name: this.payWay[this.selectId].pay_name,
+						id: this.payWay[this.selectId].id
+
+					}
 				})
 			},
-			async getCard() {
-				const res = await DATA.getCardInfo();
-				this.cardInfo = res.data;
-				this.cardId = res.data.id;
-
-			}
+	
 		}
 	}
 </script>
@@ -63,28 +63,33 @@
 <style lang="less" scoped>
 	.pay1 {
 		text-align: left;
+		.body{
+			overflow: hidden;
+		}
 		.cardInfo {
 			overflow: hidden;
 			margin: 10px 0;
+			float: left;
+			margin-right: 20px;
 			border: 1px dashed #cacaca;
 			width: 270px;
 			padding: 13px 0 20px 20px;
-			cursor:pointer;
-			position:relative;
-			&.select{
-				 border: 1px solid #ea3146;
+			cursor: pointer;
+			position: relative;
+			&.select {
+				border: 1px solid #ea3146;
 			}
 			i.mark {
-		      display: block;
-		      position: absolute;
-		      right: 0;
-		      bottom: 0;
-		      width: 16px;
-		      height: 17px;
-		      margin: 0;
-		      background: url(./img/rbank-icon.png) no-repeat;
-		      background-position: 0 -63px;
-		    }
+				display: block;
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				width: 16px;
+				height: 17px;
+				margin: 0;
+				background: url(./img/rbank-icon.png) no-repeat;
+				background-position: 0 -63px;
+			}
 			.icon {
 				width: 50px;
 				height: 38px;

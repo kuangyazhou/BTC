@@ -15,7 +15,7 @@
           <el-table-column :label="$t('message.operate')" align="center" width="200">
             <template slot-scope="scope">
               <el-button size="mini" @click="equalHandle(scope.row)">{{$t('message.order_list')}}</el-button>
-              <el-button size="mini" @click="raplHandl(scope.row)">{{$t('message.rapl')}}</el-button>
+              <el-button size="mini" @click="raplHandle(scope.row)">{{$t('message.rapl')}}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -40,7 +40,7 @@
           <el-table-column :label="$t('message.buy_total')" align="center" prop="buyNum"></el-table-column>
           <el-table-column :label="$t('message.sale_total')" align="center" prop="saleNum"></el-table-column>
           <el-table-column :label="$t('message.what')" align="center" prop="what"></el-table-column>
-          <el-table-column :label="$t('message.max_keep')" align="center" prop="max_keep"></el-table-column>
+          <el-table-column key="max_keep" v-if="level>0" :label="$t('message.max_keep')" align="center" prop="max_keep"></el-table-column>
         </el-table>
       </el-col>
     </el-row>
@@ -98,7 +98,13 @@
           <el-table-column :label="$t('message.comWin')" align="center" prop="companyProfit" width="100"></el-table-column>
           <el-table-column :label="$t('message.comCharge')" align="center" prop="companyCharge" width="110"></el-table-column>
           <el-table-column :label="$t('message.comNight')" align="center" prop="companyNight" width="110"></el-table-column>
-          <el-table-column :label="$t('l.cjlx')" align="center" prop="dealType"></el-table-column>
+          <el-table-column :label="$t('l.cjlx')" align="center" prop="dealType">
+            <template slot-scope="scope">
+              <span v-if="scope.row.dealType==0" key="111">{{$t('message.userEntrust')}}</span>
+              <span v-if="scope.row.dealType==1" key="222">{{$t('message.systemForce')}}</span>
+              <span v-if="scope.row.dealType==2" key="333">{{$t('message.endForce')}}</span>
+            </template>
+          </el-table-column>
         </el-table>
       </el-col>
     </el-row>
@@ -108,7 +114,7 @@
           <el-table-column type="index" align="center"></el-table-column>
           <el-table-column :label="$t('message.memberAccount')" align="center" prop="account"></el-table-column>
           <el-table-column :label="$t('message.memberName')" align="center" prop="name"></el-table-column>
-          <el-table-column :label="$t('message.entrust_num')" align="center" prop="auditNum"></el-table-column>
+          <el-table-column :label="$t('message.entrust_num')" align="center" prop="orderNum"></el-table-column>
           <el-table-column :label="$t('l.wtsj')" align="center" prop="auditTime"></el-table-column>
           <el-table-column :label="$t('message.entrust_type')" align="center" prop="auditType"></el-table-column>
           <el-table-column :label="$t('message.productName')" align="center" prop="productName"></el-table-column>
@@ -123,7 +129,7 @@
           <el-table-column :label="$t('message.comPen')" align="center" prop="company" width="110"></el-table-column>
           <el-table-column :label="$t('message.comCharge')" align="center" prop="companyCharge" width="110"></el-table-column>
           <el-table-column :label="$t('message.pattern')" align="center" prop="auditType"></el-table-column>
-          <el-table-column :label="$t('message.audit')" align="center">
+          <el-table-column :label="$t('message.audit')" align="center" fixed='right'>
             <template slot-scope="scope">
               <!-- <el-button size="mini" @click="productClose(scope.row)">通过/不通过</el-button> -->
               <el-dropdown @command="command=>operate(command,scope.row)">
@@ -155,10 +161,10 @@
         <el-col>
           <el-form size="mini" :inline="true" :model="formForce" :rules="forceRule" ref="forceForm">
             <el-form-item label="会员帐号">
-              <el-input size="mini" v-model="formForce.account"></el-input>
+              <el-input :readonly="true" size="mini" v-model="formForce.account"></el-input>
             </el-form-item>
             <el-form-item label="会员名称">
-              <el-input size="mini" v-model="formForce.name"></el-input>
+              <el-input :readonly="true" size="mini" v-model="formForce.name"></el-input>
             </el-form-item>
             <el-form-item label="强平价格" prop="forcePrice">
               <el-input size="mini" v-model="formForce.forcePrice"></el-input>
@@ -200,23 +206,23 @@
       </span>
     </el-dialog>
     <el-dialog title="补仓操作" :visible="raplSwitch" :before-close="raplClose">
-      <el-form :inline="true">
+      <el-form :inline="true" :model="formRapl" :rules="raplRule" label-width="100px" ref="formRapl">
         <el-form-item label="会员帐号">
-          <el-input size="mini"></el-input>
+          <el-input :readonly="true" size="mini" v-model="formRapl.account"></el-input>
         </el-form-item>
         <el-form-item label="会员姓名">
-          <el-input size="mini"></el-input>
+          <el-input :readonly="true" size="mini" v-model="formRapl.name"></el-input>
         </el-form-item>
-        <el-form-item label="补仓金额">
-          <el-input size="mini"></el-input>
+        <el-form-item label="补仓金额" prop='repair_amount'>
+          <el-input size="mini" v-model="formRapl.repair_amount"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="raplClose">取消</el-button>
-        <el-button size="mini">确认</el-button>
+        <el-button size="mini" @click="raplSubmit">确认</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="委托审核" :visible="entrustSwitch">
+    <el-dialog title="委托审核" :visible="entrustSwitch" :before-close="()=>entrustSwitch=false">
       <el-row>
         <el-col>
           <el-form size="mini" :inline="true" :model="formAudit" ref="auditForm">
@@ -240,7 +246,7 @@
         <el-button size="mini" @click="entrustHandler">确认</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="点差修改" :visible="updateSwitch">
+    <el-dialog title="点差修改" :visible="updateSwitch" :before-close="()=>updateSwitch=false">
       <el-row>
         <el-col>
           <!--  label-width="80px" -->
@@ -291,7 +297,8 @@ import {
   CheckboxGroup,
   Pagination,
   Message,
-  MessageBox
+  MessageBox,
+  BreadcrumbItem
 } from "element-ui";
 Vue.use(Row);
 Vue.use(Col);
@@ -340,6 +347,12 @@ export default {
         name: "",
         forcePrice: ""
       },
+      formRapl: {
+        user_id: "",
+        account: "",
+        name: "",
+        repair_amount: ""
+      },
       formAudit: {
         account: "",
         name: "",
@@ -360,54 +373,56 @@ export default {
       memberMoney: [],
       netData: [],
       productDetail: [
-        {
-          account: "a001",
-          name: "张三",
-          orderNum: "t151010101",
-          keepTime: "2015-5-5",
-          productName: "BTC",
-          direction: "买",
-          keepNum: "1",
-          loos: "2",
-          profit: "3",
-          openPrice: "1000",
-          currentPrice: "item.current_price",
-          keepDay: "item.hold_days",
-          float: "5",
-          used: "1000",
-          company: "100",
-          companyFloat: "101",
-          openTime: "2017-03-28"
-        },
-        {
-          account: "a002",
-          name: "张三",
-          orderNum: "t151010101",
-          keepTime: " item.entrusted_times",
-          productName: "BTC",
-          direction: "买",
-          keepNum: "1",
-          loos: "2",
-          profit: "3",
-          openPrice: "1000",
-          currentPrice: "0.1",
-          keepDay: "1",
-          float: "item.float_win_loss",
-          used: "item.used_deposit_amount",
-          company: "100",
-          companyFloat: "101",
-          openTime: " item.order_date"
-        }
+        // {
+        //   account: "a002",
+        //   name: "张三",
+        //   orderNum: "t151010101",
+        //   keepTime: " item.entrusted_times",
+        //   productName: "BTC",
+        //   direction: "买",
+        //   keepNum: "1",
+        //   loos: "2",
+        //   profit: "3",
+        //   openPrice: "1000",
+        //   currentPrice: "0.1",
+        //   keepDay: "1",
+        //   float: "item.float_win_loss",
+        //   used: "item.used_deposit_amount",
+        //   company: "100",
+        //   companyFloat: "101",
+        //   openTime: " item.order_date"
+        // }
       ],
       dealData: [],
       auditData: [],
       equalData: [],
+      raplRule: {
+        repair_amount: [
+          {
+            required: true,
+            message: "补仓价格必填",
+            trigger: "blur"
+          }
+        ]
+      },
       forceRule: {
         forcePrice: [
           {
             required: true,
             message: "强平价格必填",
-            trigger: "blur"
+            trigger: "blur",
+            validator: (rule, value, callback) => {
+              if (Number(this.formForce.forcePrice) < 0) {
+                Message({
+                  center: true,
+                  message: "强平价格不能为负数",
+                  type: "error"
+                });
+                // callback();
+              } else {
+                callback();
+              }
+            }
           }
         ]
       }
@@ -417,7 +432,7 @@ export default {
     receiveItem: function(val) {
       // console.log(val);
       if (val === "audit") {
-        this.initAudit({ size: 0 });
+        this.initAudit({ size: 1 });
       }
       if (val === "audit_big") {
         this.initAudit({ size: 2 });
@@ -425,7 +440,6 @@ export default {
       if (val === "audit_special") {
         this.initAudit({ size: 3 });
       }
-
       if (val === "deal") {
         this.initDeal({});
       }
@@ -438,6 +452,14 @@ export default {
       if (val === "member") {
         this.initList({});
       }
+    }
+  },
+  computed: {
+    level() {
+      return (
+        Number(this.$store.state.user.level) ||
+        Number(JSON.parse(sessionStorage.getItem("user")).level)
+      );
     }
   },
   created() {
@@ -622,36 +644,86 @@ export default {
       this.equalSwitch = true;
     },
     equalClose() {
+      this.$refs["forceForm"].resetFields();
       this.equalSwitch = false;
     },
-    raplHandl(e) {
-      // console.log(e);
+    raplHandle(e) {
       this.raplSwitch = true;
+      this.formRapl.account = e.account;
+      this.formRapl.name = e.name;
+      this.formRapl.user_id = e.id;
+    },
+    raplSubmit(e) {
+      this.$refs["formRapl"].validate(valid => {
+        if (valid) {
+          const arg = {
+            user_id: this.formRapl.user_id,
+            repair_amount: this.formRapl.repair_amount
+          };
+          this.$store.dispatch("rapl", arg).then(res => {
+            if (res.data.status == 1) {
+              Message({
+                type: "success",
+                message: "补仓成功",
+                onClose: () => {
+                  this.raplSwitch = false;
+                }
+              });
+            }
+          });
+        }
+      });
     },
     raplClose() {
       this.raplSwitch = false;
     },
-    pageChange(e) {},
+    pageChange(e) {
+      switch (this.receiveItem) {
+        case "audit":
+          this.initAudit({ size: 1, page: e });
+          break;
+        case "audit_big":
+          this.initAudit({ size: 2, page: e });
+          break;
+        case "audit_special":
+          this.initAudit({ size: 3, page: e });
+          break;
+        case "deal":
+          // this.initDeal({ page: e });
+          break;
+        case "net_cash":
+          this.initNet({ type: 1, page: e });
+          break;
+        case "net_credit":
+          this.initNet({ type: 0, page: e });
+          break;
+        case "member":
+          this.initList({ page: e });
+          break;
+        default:
+      }
+    },
     viewUser(e) {
       // console.log(e);
     },
     search(e) {
-      console.log(this.formReceive);
+      // console.log(this.formReceive);
     },
     initNet(arg) {
       this.$store.dispatch("netSearch", arg).then(res => {
         // console.log(res);
         if (res.data.status == 1) {
           this.loading = false;
+          Object.assign(this.page, res.data.data.page);
           const data = res.data.data.list;
           this.netData = [];
           data.forEach(item => {
             this.netData.push({
               name: item.product_name,
-              buy: item.current_price,
+              buy: item.buy_price,
               spread: item.order_diff,
               sale: item.sale_price,
-              refer: item.buy_price,
+              refer: item.current_price,
               buyNum: item.buy_total_num,
               saleNum: item.sale_total_num,
               what: item.buy_sale_diff_num,
@@ -665,6 +737,7 @@ export default {
       this.$store.dispatch("memberDeal", arg).then(res => {
         // console.log(res);
         if (res.data.status == 1) {
+          Object.assign(this.page, res.data.data.page);
           this.loading = false;
           const data = res.data.data.list;
           this.dealData = [];
@@ -691,6 +764,7 @@ export default {
               companyCharge: item.share_service_fee,
               companyNight: item.share_overnight_fee,
               dealType: item.deal_type
+              ////成交类型（0：用户委托，1：系统强制平仓，2：后台强制平仓）
             });
           });
         }
@@ -700,6 +774,7 @@ export default {
       this.$store.dispatch("entrust", arg).then(res => {
         // console.log(res);
         if (res.data.status == 1) {
+          Object.assign(this.page, res.data.data.page);
           this.loading = false; //关闭loading
           const data = res.data.data.list;
           this.auditData = [];
@@ -707,7 +782,7 @@ export default {
             this.auditData.push({
               account: item.user_account,
               name: item.user_name,
-              auditNum: item.order_number,
+              orderNum: item.order_number,
               auditTime: item.order_date,
               auditType: item.entrusted_type ? "限价委托" : "市场委托",
               productName: item.product_name,
@@ -737,6 +812,7 @@ export default {
         // console.log(res);
         if (res.data.status == 1) {
           this.loading = false; //关闭loading
+          Object.assign(this.page, res.data.data.page);
           this.memberMoney = [];
           this.page = res.data.data.page;
           const data = res.data.data.list;

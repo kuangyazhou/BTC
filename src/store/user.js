@@ -34,12 +34,20 @@ import {
 
 const user = {
   state: {
-    userInfo: getUserInfo() || null,
-    dayPrice:[[0,0,0,0,0]],
-    range:0,
-    userName: null,    
-    level: null,
+    userInfo: getUserInfo() || '',
+    dayPrice: [
+      [0, 0, 0, 0, 0]
+    ],
+    range: 0,
+    userName: null,
+    level: sessionStorage.getItem('level') || '',
     token: false,
+    sub: '',
+    msg: '',
+    rechargeWay: '',
+    changeUrl: '',
+    countDown:'',
+    socketUrl: '{"Path":"price","Flag":3,"Sub":"btc/minute1","Msg":"","Status":0}',
     loginByAccount: sessionStorage.getItem('loginByAccount') || null
   },
   mutations: {
@@ -48,16 +56,36 @@ const user = {
       state.userName = user.data.user_name;
       state.level = user.data.level;
       state.token = true;
+      state.sub = user.data.sub_admin;
+      sessionStorage.setItem('level', user.data.level)
     },
-    	//存储价格
-  	getPrice(state,dayPrice){
-  		state.dayPrice = dayPrice;
-  		state.range = (
-          (dayPrice[0][2] - dayPrice[0][1]) /
-          dayPrice[0][1] *
-          100
-        ).toFixed(2);
-  	},
+    //修改支付方式
+    set_rechargeWay(state, rechargeWay) {
+
+      state.rechargeWay = rechargeWay;
+    },
+    //修改websoket请求url
+    setMsg(state, msg) {
+      state.msg = msg;
+    },
+    //websocket返回值
+    setSocketUrl(state, a) {
+      state.socketUrl = a.url;
+      state.changeUrl = a.random;
+    },
+    //存储价格
+    getPrice(state, dayPrice) {
+      state.dayPrice = dayPrice;
+      state.range = (
+        (dayPrice[0][2] - dayPrice[0][1]) /
+        dayPrice[0][1] *
+        100
+      ).toFixed(2);
+    },
+    //存储熔断信息
+    getCountDown(state, countDown) {
+      state.countDown=countDown
+    },
     SET_Account: (state) => {
       state.loginByAccount = true;
       sessionStorage.setItem('loginByAccount', true)
@@ -75,7 +103,7 @@ const user = {
     }
   },
   actions: {
-  
+
     // 登录
     loginByuserName({
       commit
@@ -85,6 +113,7 @@ const user = {
       return login(name, password).then(response => {
         // 当res中带有token并且与本地token不同时，更新一次;
         // setToken(response.headers.authorization);
+
         commit('SET_USER', response.data);
         commit('SET_admin');
         setUserInfo(response.data.data);

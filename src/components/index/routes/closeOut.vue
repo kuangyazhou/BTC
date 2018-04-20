@@ -9,7 +9,7 @@
 				<div class="panel">
 					<div class="hd">
 						<span>{{$t('l.ky')}}</span>
-						<span class="buy_available">{{userInfo.avail_deposit_amount||0.00000}}</span>
+						<span class="buy_available">{{userInfo.avail_deposit_amount||0.00}}</span>
 						<span>USDT</span>
 						<a @click="$router.push({'path':'/userCenter'})">{{$t('l.cb')}}</a>
 					</div>
@@ -18,11 +18,11 @@
 							<div class="label" v-show="orders.order_direction==-1">{{$t('l.mrj')}}</div>
 							<div class="label" v-show="orders.order_direction==1">{{$t('l.mcj')}}</div>
 							<label>
-                     					<input type="text" maxlength="14" v-model="entrusted_price"/>
+                     					<input type="text" maxlength="14" v-model="entrusted_price" @input="entrusted_price=entrusted_price.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      		</label>
 							<div class="math-price">
-								≈ {{entrusted_price*userInfo.exchange_rate||0.00000}} CNY
+								≈ {{entrusted_price*userInfo.exchange_rate||0.00}} CNY
 							</div>
 						</div>
 						<div class="input-text  input-price" v-if="entrusted_type==0">
@@ -37,7 +37,7 @@
 						<div class="input-text" v-if="entrusted_type==0">
 							<div class="label">{{$t('ar.bjdc')}}</div>
 							<label>
-                     					<input type="text" maxlength="14" v-model="accept_change_range"/>
+                     					<input type="text" maxlength="14" v-model="accept_change_range" @input="accept_change_range=accept_change_range.replace(/[^0-9.]/g, '')"/>
                      					<span>USDT</span>
                      	    </label>
 
@@ -46,16 +46,16 @@
 							<div class="label" v-show="orders.order_direction==-1">{{$t('l.mrl')}}</div>
 							<div class="label" v-show="orders.order_direction==1">{{$t('l.mcl')}}</div>
 							<label>
-                     			<input type="text" maxlength="14" v-model="entrusted_number"/>
+                     			<input type="text" maxlength="14" v-model="entrusted_number" @input="entrusted_number=entrusted_number.replace(/[^0-9.]/g, '')"/>
                      			<span>BTC</span>
                      	    </label>
 
 						</div>
 						<div class="account-range">
-							<span class="min">{{$t('ar.sxf')}} {{entrusted_price*entrusted_number*userInfo.close_fee_percentage/100||0.000}} USDT</span>
+							<span class="min">{{$t('ar.sxf')}} {{(entrusted_price*entrusted_number*userInfo.close_fee_percentage/100||0.00).toFixed(2)}} USDT</span>
 							<!--<span class="max">0.0000 USDT</span>-->
 							<div class="total" v-if="entrusted_type==1">
-								{{$t('l.jye')}} {{entrusted_price*entrusted_number||0.000}} USDT
+								{{$t('l.jye')}} {{(entrusted_price*entrusted_number).toFixed(2)||0.00}} USDT
 							</div>
 						</div>
 					</div>
@@ -91,17 +91,29 @@
 		},
 		mounted(){
 			this.changeDialogType(1)
+		
+		},
+		watch:{
+			orders:function(val){
+				if(val.order_direction == -1) {			
+					this.entrusted_price = this.dayPrice[0][2];
+				} else if(this.orders.order_direction == 1){
+					this.entrusted_price = this.dayPrice[0][2]-this.userInfo.user_order_diff;
+				}
+			}
 		},
 		computed: {
 			userInfo: function() {
 				return this.$store.state.user.userInfo
 			},
 			dayPrice:function(){
+								
 				return this.$store.state.user.dayPrice
 			},
 			newSellPrice:function(){
+				
 				if(this.userInfo){
-					return this.dayPrice[0][2]-this.userInfo.user_order_diff;//卖出时减去点差
+					return this.dayPrice&&this.dayPrice[0][2]-this.userInfo.user_order_diff;//卖出时减去点差
 				}
 				
 			}
@@ -111,12 +123,7 @@
 		methods: {
 			//重置弹框数值
 			changeDialogType(a) {
-				this.entrusted_type = a;
-				if(this.order_direction == 1) {
-					this.entrusted_price = this.dayPrice[0][2];
-				} else {
-					this.entrusted_price = this.newSellPrice;
-				}
+				this.entrusted_type = a;		
 				this.buy_profit_limit = '';
 				this.buy_loss_limit = '';
 				this.entrusted_number = '';
@@ -138,7 +145,7 @@
 					return;
 				}
 				if(this.entrusted_type == 0) {
-					if(this.order_direction == 1) {
+					if(this.orders.order_direction == -1) {
 						this.entrusted_price = this.dayPrice[0][2];
 					} else {
 						this.entrusted_price = this.newSellPrice;
@@ -151,7 +158,6 @@
 					hold_order_id: this.orders.order_id,
 					accept_change_range: this.accept_change_range
 				}
-				console.log(data);
 				request({
 					data: data,
 					method: 'post',

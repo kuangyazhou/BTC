@@ -9,11 +9,11 @@
 		            </span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item :command="index" v-for="(item,index) in coinArr" :key="index">{{item.name}}</el-dropdown-item>
-	
+
 					</el-dropdown-menu>
 				</el-dropdown>
 			</div>
-			
+
 			<div class="right-price">
 				<span class="now-price">
 				<i><b class="price up"  v-if="range>=0">{{dayPrice[0][2].toFixed(3)}}</b>
@@ -22,15 +22,15 @@
 				</i>
 				<b>{{$t('l.now-price')}}</b>
 				</span>
-					<span class="high-price">
+				<span class="high-price">
 					<b class="price">{{dayPrice[0][4].toFixed(3)}}</b>
 					<b>{{$t('l.high-price')}}</b>
 				</span>
-					<span class="low-price">
+				<span class="low-price">
 					<b class="price">{{dayPrice[0][3].toFixed(3)}}</b>
 					<b>{{$t('l.low-price')}}</b>
 				</span>
-					<span class="open-price">
+				<span class="open-price">
 					<b class="price">{{dayPrice[0][1].toFixed(3)}}</b>
 					<b>{{$t('l.open-price')}}</b>
 				</span>
@@ -167,36 +167,50 @@
 				}
 			}
 		},
-	
-		mounted() {
+		computed: {
+			socketUrl: function() {
+				return this.$store.state.user.socketUrl;
+			},
+			msg: function() {
+
+				return this.$store.state.user.msg;
+			}
+		},
+		watch:{
+			msg:function(val){
 		
-			var marketSocketUrl = "ws://192.168.123.136:8888/kline"; //websocket地址
-			var marketUserName = " "; //websocket名字
-			var marketPassword = " "; //websocket密码
-			var that = this;
-			this.marketSocket = new WebSocket(marketSocketUrl);
+				if(val){
+					this.setWebSocket()
+				}
+				
+			}
 			
+		},
+		mounted() {
 
-			var that = this;
+			let marketUserName = " "; //websocket名字
+			let marketPassword = " "; //websocket密码
+			let that = this;
+
 			this.myChart = echarts.init(document.getElementById('chart'));
-			//记录缩放位置
-			var start = '';
-			this.myChart.on('datazoom', function(params) {
 
+			//记录缩放位置
+			let start = '';
+			
+			this.myChart.on('datazoom', function(params) {
+			
 				start = params.batch[0].start;
 				//小于10往前添加数据
-
-				if(start == 0 && that.getNew) {
-
-					if(that.preDay > that.tabMenu[that.tabIndex].maxPreDay) {
-
+				
+				if(start == 0&& that.getNew) {
+				
+					if(that.preDay > that.tabMenu[that.tabIndex].maxPreDay) {					
 						return;
 					}
-					that.preDay = that.preDay * 1.2;
+					that.tabMenu[that.tabIndex].preDay *=1.2;
 					that.start = 0;
 					that.setTime();
-
-					that.setWebSocket(that.marketSocket, that.preClock + '/' + that.clock, that.tabValue);
+					that.setData(that.tabIndex)
 					return;
 				}
 			});
@@ -205,8 +219,7 @@
 			//				console.log(params);
 			//			});
 			this.setTime();
-			
-			this.setWebSocket(this.marketSocket, this.preClock + '/' + this.clock, this.tabValue);
+			this.setData(this.tabIndex)
 			window.onresize = function() {
 				that.myChart.resize();
 			}
@@ -220,7 +233,7 @@
 			},
 			//获取接受时间
 			setTime() {
-				
+
 				function add0(a) {
 					if(a < 10) {
 						return "0" + a;
@@ -228,19 +241,19 @@
 						return a
 					}
 				}
-				var now = new Date();
-				var preDate = new Date(now.getTime() - this.preDay * 24 * 60 * 60 * 1000);
-				var year = now.getFullYear(),
+				let now = new Date();
+				let preDate = new Date(now.getTime() - this.preDay * 24 * 60 * 60 * 1000);
+				let year = now.getFullYear(),
 					preYear = preDate.getFullYear(); //年  
-				var month = add0(now.getMonth() + 1),
+				let month = add0(now.getMonth() + 1),
 					preMonth = add0(now.getMonth() + 1); //月  
-				var day = add0(now.getDate()),
+				let day = add0(now.getDate()),
 					preDay = add0(preDate.getDate()); //日  
-				var hh = add0(now.getHours()),
+				let hh = add0(now.getHours()),
 					prehh = add0(preDate.getHours()); //时  
-				var mm = add0(now.getMinutes()),
+				let mm = add0(now.getMinutes()),
 					premm = add0(preDate.getMinutes()); //分  
-				var caseDate = {
+				let caseDate = {
 					minute1: ['' + year + month + day + hh + mm, '' + preYear + preMonth + preDay + prehh + premm],
 					minute5: ['' + year + month + day + hh + mm, '' + preYear + preMonth + preDay + prehh + premm],
 					minute15: ['' + year + month + day + hh + mm, '' + preYear + preMonth + preDay + prehh + premm],
@@ -256,9 +269,9 @@
 				this.preClock = caseDate[this.tabValue][1];
 
 			},
-			
+
 			setData(index) {
-				
+
 				this.cover = true;
 				//分时图分开
 				if(index == -1) {
@@ -276,176 +289,130 @@
 				}
 
 				this.setTime();
-				
-				this.setWebSocket(this.marketSocket, this.preClock + '/' + this.clock, this.tabValue);
+				this.getNew = false;
+				this.arrGather[this.tabValue] = [];
+				let  url = '{"Path":"price","Flag":3,"Sub":"btc/' + this.tabValue + '","Msg":"' + this.preClock + '/' + this.clock +'","Status":0}';
+				let a ={
+					'url':url,
+					'random':Math.random()
+				}
+				this.$store.commit("setSocketUrl",a);
+			
 
 			},
-			setWebSocket(marketSocket, time, a) {
-				var that = this;
-
-				that.getNew = false;
-				that.arrGather[a] = [];
-
-				marketSocket.onopen = function(evt) {
-					var sendData = '{"Flag":3,"Sub":"btc/' + a + '","Msg":"' + time + '","Status":0}';
-					
-					marketSocket.send(sendData);
-
-				};
-				marketSocket.onerror = function() {
-
-				};
-				marketSocket.onclose = function() {
-					// 关闭 websocket
-					console.log('连接已关闭...')
-					if(!that.reConnect) {
-						return;
-					}
-					
-					setTimeout(function() {
-						var marketSocketUrl = "ws://192.168.123.136:8888/kline "; //websocket地址			
-						that.marketSocket = new WebSocket(marketSocketUrl);
-						that.setTime();
-						that.setWebSocket(that.marketSocket, that.preClock + '/' + that.clock, that.tabValue);
-						console.log('连接重连...')
-					}, 1000);
-
-				}
-				var setSend = true;
+			setWebSocket() {
+				let that = this;
+				let a = this.tabValue;			
 				that.cover = false;
-				marketSocket.onmessage = function(evt) {
-					 
-					//console.log(evt.data.kLine);
-					// kLine
-					that.prebeat = that.heartbeat;
-					if(setSend == true) {
+			
+				if(this.msg.kLine && this.msg.price == -1 && that.arrGather[a].length == 0) {
+					// console.log(data);
+					
+					that.arrGather[a] = this.msg.kLine;
+					that.allArr = that.arrGather[a];
+					that.dayPrice = this.msg.dayPrice ? this.msg.dayPrice : that.dayPrice;
 
-						var sendData = '{"Flag":3,"Sub":"btc/' + a + '","Msg":"' + time + '","Status":0}';
-						//console.log(sendData)
-						marketSocket.send(sendData);
-						setSend = false;
+					that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
+					let data0 = that.splitData(that.arrGather[a]);
+					//设置分时图显示
+					if(that.setLine == true) {
+						that.option = that.getLineOption(that.arrGather[a]);
+						that.myChart.clear();
+						that.myChart.setOption(that.option);
+					} else {
 
+						that.option = that.getOption(data0);
+						that.myChart.clear();
+						that.newTime = data0.categoryData[data0.categoryData.length - 1];
+						//console.log(data0)
+						that.myChart.setOption(that.option);
 					}
-					var data = JSON.parse(evt.data);
-                    
-					if(data.kLine && data.price == -1 && that.arrGather[a].length == 0) {
-                       // console.log(data);
-						that.arrGather[a] = data.kLine;
-						that.allArr = that.arrGather[a];
-						that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
-						
-						that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
-						var data0 = that.splitData(that.arrGather[a]);
-						//设置分时图显示
-						if(that.setLine == true) {
 
-							that.option = that.getLineOption(that.arrGather[a]);
-							that.myChart.clear();
+					that.getNew = true;
+				}
+
+				if(this.msg.kLine && this.msg.price != -1 && that.getNew) {
+			   
+					let arrn = this.msg.kLine[0];
+					//设置分时图显示
+					that.dayPrice = this.msg.dayPrice ? this.msg.dayPrice : that.dayPrice;
+					that.$emit('setInitialPrice', that.dayPrice);
+					that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
+					//document.title = (that.dayPrice[0][2]).toFixed(3)+' BTC 交易系统'                       	
+					//console.log( this.msg.kLine[0]);
+					if(this.msg.kLine[0][0] == that.newTime) {
+						if(that.setLine == true) {					
+							that.option = that.myChart.getOption();
+							that.option.series[0].data[that.option.series[0].data.length - 1] = this.msg.kLine[0][2];
+							that.option.series[0].markLine.data[0].yAxis = this.msg.kLine[0][2];
+
+							that.option.series[0].markLine.data[1].yAxis = this.msg.kLine[0][2];
 							that.myChart.setOption(that.option);
-						} else {
-
-							that.option = that.getOption(data0);
-							that.myChart.clear();
-							that.newTime = data0.categoryData[data0.categoryData.length - 1];
-							//console.log(data0)
-							that.myChart.setOption(that.option);
-						}
-
-						that.getNew = true;
-					}
-
-					if(data.Flag == 1) {
-
-						that.heartbeat = JSON.parse(evt.data).Msg;
-
-						marketSocket.send('{"Flag":2,"Msg":"' + that.heartbeat + '","Status":0}');
-
-					}
-
-					if(data.kLine && data.price != -1 && that.getNew) {
-
-						var arrn = data.kLine[0];
-						//设置分时图显示
-						that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
-						that.$emit('setInitialPrice',that.dayPrice);
-						that.range = (((that.dayPrice[0][2] - that.dayPrice[0][1]) / that.dayPrice[0][1]) * 100).toFixed(2);
-                        //document.title = (that.dayPrice[0][2]).toFixed(3)+' BTC 交易系统'                       	
-						//console.log( data.kLine[0]);
-						if(data.kLine[0][0] == that.newTime) {
-							if(that.setLine == true) {
-        
-								that.option = that.myChart.getOption();
-								that.option.series[0].data[that.option.series[0].data.length - 1] = data.kLine[0][2];
-								that.option.series[0].markLine.data[0].yAxis = data.kLine[0][2];
-
-								that.option.series[0].markLine.data[1].yAxis = data.kLine[0][2];
-								that.myChart.setOption(that.option);
-								return;
-							} else {
-								that.allArr[that.allArr.length - 1] = data.kLine[0];
-								var data0 = that.splitData(that.allArr);
-								that.option = that.myChart.getOption();
-
-								that.option.series[0].markLine.data[0].yAxis = data.kLine[0][2];
-
-								that.option.series[0].markLine.data[1].yAxis = data.kLine[0][2];
-								that.option.series[0].data[that.option.series[0].data.length - 1] = arrn.slice(1);
-								that.option.series[1].data[that.option.series[1].data.length - 1] = that.calculateLast(data0, 5);
-								that.option.series[2].data[that.option.series[2].data.length - 1] = that.calculateLast(data0, 10);
-								that.option.series[3].data[that.option.series[3].data.length - 1] = that.calculateLast(data0, 20);
-								that.option.series[4].data[that.option.series[4].data.length - 1] = that.calculateLast(data0, 30);
-
-								that.myChart.setOption(that.option);
-							}
-
 							return;
 						} else {
-							that.newTime = data.kLine[0][0];
-
-							if(that.setLine == true) {
-
-								that.option = that.myChart.getOption();
-
-								that.option.series[0].markLine.data[0].yAxis = data.kLine[0][2];
-								that.option.series[0].markLine.data[1].yAxis = data.kLine[0][2];
-								that.option.xAxis[0].data.push(data.kLine[0][0]);
-								that.option.series[0].data.push(data.kLine[0][2]);
-								that.myChart.setOption(that.option, true);
-								return;
-							}
-
-							for(var i = 0; i < arrn.length; i++) {
-								arrn[i] = parseFloat(arrn[i])
-							}
-							that.allArr.push(data.kLine[0]);
+							that.allArr[that.allArr.length - 1] = this.msg.kLine[0];
+							let data0 = that.splitData(that.allArr);
 							that.option = that.myChart.getOption();
-							//console.log(data.kLine[0][0])
-							that.option.xAxis[0].data.push(data.kLine[0][0]);
 
-							var data0 = that.splitData(that.allArr);
-							data0.values.push(arrn.slice(1));
-							that.option.series[0].data.push(arrn.slice(1));
-							that.option.series[1].data.push(that.calculateLast(data0, 5));
-							that.option.series[2].data.push(that.calculateLast(data0, 10));
-							that.option.series[3].data.push(that.calculateLast(data0, 20));
-							that.option.series[4].data.push(that.calculateLast(data0, 30));
+							that.option.series[0].markLine.data[0].yAxis = this.msg.kLine[0][2];
+
+							that.option.series[0].markLine.data[1].yAxis = this.msg.kLine[0][2];
+							that.option.series[0].data[that.option.series[0].data.length - 1] = arrn.slice(1);
+							that.option.series[1].data[that.option.series[1].data.length - 1] = that.calculateLast(data0, 5);
+							that.option.series[2].data[that.option.series[2].data.length - 1] = that.calculateLast(data0, 10);
+							that.option.series[3].data[that.option.series[3].data.length - 1] = that.calculateLast(data0, 20);
+							that.option.series[4].data[that.option.series[4].data.length - 1] = that.calculateLast(data0, 30);
+
 							that.myChart.setOption(that.option);
-
 						}
-					}
 
+						return;
+					} else {
+						that.newTime = this.msg.kLine[0][0];
+
+						if(that.setLine == true) {
+
+							that.option = that.myChart.getOption();
+
+							that.option.series[0].markLine.data[0].yAxis = this.msg.kLine[0][2];
+							that.option.series[0].markLine.data[1].yAxis = this.msg.kLine[0][2];
+							that.option.xAxis[0].data.push(this.msg.kLine[0][0]);
+							that.option.series[0].data.push(this.msg.kLine[0][2]);
+							that.myChart.setOption(that.option, true);
+							return;
+						}
+
+						for(let i = 0; i < arrn.length; i++) {
+							arrn[i] = parseFloat(arrn[i])
+						}
+						that.allArr.push(this.msg.kLine[0]);
+						that.option = that.myChart.getOption();
+						//console.log(this.msg.kLine[0][0])
+						that.option.xAxis[0].data.push(this.msg.kLine[0][0]);
+
+						let data0 = that.splitData(that.allArr);
+						data0.values.push(arrn.slice(1));
+						that.option.series[0].data.push(arrn.slice(1));
+						that.option.series[1].data.push(that.calculateLast(data0, 5));
+						that.option.series[2].data.push(that.calculateLast(data0, 10));
+						that.option.series[3].data.push(that.calculateLast(data0, 20));
+						that.option.series[4].data.push(that.calculateLast(data0, 30));
+						that.myChart.setOption(that.option);
+
+					}
 				}
+
 			},
 			splitData(rawData) {
-				var categoryData = [];
-				var values = [];
+				let categoryData = [];
+				let values = [];
 
-				for(var i = 0; i < rawData.length; i++) {
-					var a = rawData[i];
+				for(let i = 0; i < rawData.length; i++) {
+					let a = rawData[i];
 
 					categoryData.push(a[0]);
 
-					for(var j = 0; j < rawData[i].length; j++) {
+					for(let j = 0; j < rawData[i].length; j++) {
 						rawData[i][j] = parseFloat(rawData[i][j])
 					}
 
@@ -460,13 +427,13 @@
 			//计算最后一个新加的数
 			calculateLast(data0, dayCount) {
 
-				var result = '',
+				let result = '',
 					sum = 0;
 
 				if(data0.values.length < dayCount) {
 					result = null
 				} else {
-					for(var i = 0; i < dayCount; i++) {
+					for(let i = 0; i < dayCount; i++) {
 
 						sum += data0.values[data0.values.length - i - 1][1];
 					}
@@ -478,14 +445,14 @@
 			},
 
 			calculateMA(data0, dayCount) {
-				var result = [];
-				for(var i = 0, len = data0.values.length; i < len; i++) {
+				let result = [];
+				for(let i = 0, len = data0.values.length; i < len; i++) {
 					if(i < dayCount) {
 						result.push('-');
 						continue;
 					}
-					var sum = 0;
-					for(var j = 0; j < dayCount; j++) {
+					let sum = 0;
+					for(let j = 0; j < dayCount; j++) {
 						sum += data0.values[i - j][1];
 					}
 					result.push(sum / dayCount);
@@ -494,12 +461,12 @@
 			},
 			getOption(data0) {
 				//console.log(data0)
-				var upColor = '#ef5555';
-				var upBorderColor = '#ef5555';
-				var downColor = '#03c087';
-				var downBorderColor = '#03c087';
-				var that = this;
-				var option = {
+				let upColor = '#ef5555';
+				let upBorderColor = '#ef5555';
+				let downColor = '#03c087';
+				let downBorderColor = '#03c087';
+				let that = this;
+				let option = {
 					title: {
 
 						left: 0
@@ -537,7 +504,7 @@
 							formatter: function(params) {
 								if(params.value.length > 3) {
 
-									var a = params.value.substring(10, 12) ? params.value.substring(10, 12) : '00'
+									let a = params.value.substring(10, 12) ? params.value.substring(10, 12) : '00'
 									return +params.value.substring(0, 4) + '-' +
 										params.value.substring(4, 6) + '-' +
 										params.value.substring(6, 8) +
@@ -735,14 +702,14 @@
 				return option;
 			},
 			getLineOption(data0) {
-				var datax = [],
+				let datax = [],
 					dataSeries = [];
-				var that = this;
-				for(var i = 0; i < data0.length; i++) {
+				let that = this;
+				for(let i = 0; i < data0.length; i++) {
 					datax.push(data0[i][0])
 					dataSeries.push(data0[i][2])
 				}
-				var option1 = {
+				let option1 = {
 					title: {
 
 					},
@@ -775,7 +742,7 @@
 								formatter: function(params) {
 
 									if(params.value.toString().substring(0, 1) == '2') {
-										var a = params.value.substring(10, 12) ? params.value.substring(10, 12) : '00'
+										let a = params.value.substring(10, 12) ? params.value.substring(10, 12) : '00'
 
 										return +params.value.substring(0, 4) + '-' +
 											params.value.substring(4, 6) + '-' +
@@ -910,13 +877,6 @@
 				}
 				return option1;
 			}
-		},
-
-		beforeDestroy() {
-			this.marketSocket.send('{"Flag":5,"Msg":"","Status":0}');
-			this.reConnect = false;
-			this.marketSocket.close();
-
 		}
 	}
 </script>
@@ -934,24 +894,24 @@
 		padding-top: 20px;
 		display: flex;
 		background: url(./img/BTC.png) no-repeat 10px top;
-		.left-product{
-			width:50px;
-			float:left;
+		.left-product {
+			width: 50px;
+			float: left;
 		}
-		.el-dropdown-link {	
+		.el-dropdown-link {
 			cursor: pointer;
-           	font-size: 18px;
-           	color:#1a1a1a;
-           	display: flex;
+			font-size: 18px;
+			color: #1a1a1a;
+			display: flex;
 		}
-		.right-price{
-			flex:1;
+		.right-price {
+			flex: 1;
 		}
 		.high-price,
 		.low-price,
 		.open-price,
 		.now-price {
-			float:left;
+			float: left;
 			display: inline-block;
 			width: 150px;
 			text-align: right;
@@ -978,7 +938,7 @@
 				font-size: 20px;
 			}
 		}
-		.open-price{
+		.open-price {
 			margin-right: 0;
 		}
 	}
@@ -1018,10 +978,10 @@
 	}
 	
 	#chart {
-		position:absolute;
-		left:0;
-		top:60px;
-		right:0;
+		position: absolute;
+		left: 0;
+		top: 60px;
+		right: 0;
 		bottom: 0;
 	}
 </style>

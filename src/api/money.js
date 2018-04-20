@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import file from '@/utils/file';
 
 //充值提现设置编辑数据
 export function recharge(data) {
@@ -25,10 +26,11 @@ export function chargeList(data) {
       type = '',
       status = '',
       opstatus = '',
+      page = 1
   } = data;
   return request({
     method: 'get',
-    url: `/index.php?r=btc/amount-manage/history&account=${account}&ordernum=${ordernum}&starttime=${starttime}&endtime=${endtime}&type=${type}&status=${status}&opstatus=${opstatus}`
+    url: `/index.php?r=btc/amount-manage/history&account=${account}&ordernum=${ordernum}&starttime=${starttime}&endtime=${endtime}&type=${type}&status=${status}&opstatus=${opstatus}&page=${page}`
   })
 }
 
@@ -70,13 +72,14 @@ export function collectionOnOff(data) {
     id = ''
   } = data;
   return request({
-    data,
+    // data,
     method: 'get',
     url: `index.php?r=btc/amount-manage/pay-way-status&id=${id}`
   })
 }
 
 //收款设置列表数据
+// 1 支付宝 2微信 3银行卡
 export function collectionList(data) {
   const {
     page = 1
@@ -119,7 +122,8 @@ export function reviewMoney(data) {
 }
 // 收款设置新增
 export function collectionCreate(data) {
-  return request({
+  const {id}=data;
+  return file({
     data,
     method: 'post',
     url: '/index.php?r=btc/amount-manage/pay-way-add'
@@ -128,7 +132,7 @@ export function collectionCreate(data) {
 
 // 收款设置编辑提交
 export function collectionUpdate(data) {
-  return request({
+  return file({
     data,
     method: 'post',
     url: '/index.php?r=btc/amount-manage/pay-way-edit'

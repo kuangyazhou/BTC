@@ -6,7 +6,8 @@ import {
   entrust,
   updateSpread,
   forceClose,
-  review
+  review,
+  rapl
 } from '@/api/receive';
 
 const receive = {
@@ -94,6 +95,16 @@ const receive = {
       commit
     }, data) {
       return review(data).then(response => {
+        return response;
+      }).catch(err => {
+        throw Error(err);
+      })
+    },
+    // 补仓
+    rapl({
+      commit
+    }, data) {
+      return rapl(data).then(response => {
         return response;
       }).catch(err => {
         throw Error(err);

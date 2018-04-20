@@ -28,8 +28,8 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col style="width:99%;overflow-y: auto;">
-        <el-table :data="noticeData" :border="false" size="mini" style="height:60vh" v-loading="loading" :element-loading-text="$t('message.loading')" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0.2, 0.2, 0.2, 0.8)">
+      <el-col style="width:99%;">
+        <el-table :data="noticeData" :border="false" size="mini" style="height:60vh;overflow-y: auto;" v-loading="loading" :element-loading-text="$t('message.loading')" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0.2, 0.2, 0.2, 0.8)">
           <el-table-column type="index" align="center"></el-table-column>
           <el-table-column label="标题" align="center" prop="title"></el-table-column>
           <el-table-column label="接收人" align="center" prop="userName" :formatter="formatReceive">
@@ -54,7 +54,7 @@
       </el-pagination>
     </div>
     <el-dialog title="新增公告" :visible.sync="noticeSwitch" :before-close="()=>{noticeSwitch=false;initNoticeContent()}">
-      <el-form label-width="80px" :model="noticeContent">
+      <el-form label-width="80px" :model="noticeContent" size="mini">
         <el-form-item label="接收对象">
           <el-select v-model="noticeContent.userLevel" placeholder="请选择" size="small">
             <el-option v-for="item in receiveOption" :key="item.value" :label="item.label" :value="item.value">
@@ -63,6 +63,12 @@
         </el-form-item>
         <el-form-item label="公告标题">
           <el-input v-model="noticeContent.title" size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="登录显示">
+          <el-radio-group v-model="noticeContent.login_view">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="公告内容">
           <el-input type="textarea" :rows="10" placeholder="请输入内容" v-model="noticeContent.content">
@@ -80,6 +86,7 @@
 <script>
 import Vue from "vue";
 import request from "@/utils/request";
+import notice from "@/api/notice";
 import {
   Row,
   Col,
@@ -92,6 +99,8 @@ import {
   Table,
   Loading,
   TableColumn,
+  Radio,
+  RadioGroup,
   Input,
   Pagination,
   DatePicker,
@@ -130,7 +139,8 @@ export default {
       noticeContent: {
         title: "",
         content: "",
-        userLevel: 0
+        userLevel: 0,
+        login_view: 1
       },
       receiveOption: [
         { label: "全部", value: 0 },
@@ -182,13 +192,24 @@ export default {
     },
     getData() {
       this.loading = true;
-      let getData = {};
-      getData.page = this.page.current;
-      request({
-        method: "get",
-        params: getData,
-        url: "/index.php?r=btc/notice/list"
-      }).then(res => {
+      let getData = {
+        title: this.search.title,
+        status: this.search.status,
+        page: this.page.current,
+        time_start: this.search.time[0]
+          ? new Date(this.search.time[0]).Format("yyyy-MM-dd")
+          : "",
+        time_end: this.search.time[1]
+          ? new Date(this.search.time[1]).Format("yyyy-MM-dd")
+          : ""
+      };
+      // request({
+      //   method: "get",
+      //   params: { search: JSON.parse(getData) },
+      //   params: getData,
+      //   url: "/index.php?r=btc/notice/list"
+      // })
+      this.$store.dispatch("notice", getData).then(res => {
         let data = res.data;
         if (data.status == 1) {
           this.noticeData = data.data.datas;
@@ -316,9 +337,10 @@ export default {
       });
     }
   },
-  mounted() {
+  created() {
     this.getData();
-  }
+  },
+  mounted() {}
 };
 </script>
 

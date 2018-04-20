@@ -2,30 +2,23 @@
 	<div class="order">
 		<closeOut ref="dialog" :orders="orders"></closeOut>
 		<div class="head">
-			<el-form ref="form" label-width="80px">
-				<el-col :span="4">
-
-					<el-select v-model="value" :placeholder="$t('ar.qxz')" @change="getData()">
+			<el-form ref="form" label-width="80px" :inline="true" size="mini">
+					<el-select v-model="value" :placeholder="$t('ar.qxz')" @change="getData()" size="mini">
 						<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
 						</el-option>
 					</el-select>
 
-				</el-col>
-				<el-col :span="6">
 					<el-form-item :label="$t('order.ddh')">
 						<el-input v-model="ordernum"></el-input>
 					</el-form-item>
-				</el-col>
-				<el-col :span="6">
+
 					<el-form-item :label="$t('order.ddsj')">
-						<el-date-picker type="date" :placeholder="$t('order.xzrq')" class="datePicker" v-model="orderdate" value-format="yyyy-MM-dd">
+						<el-date-picker type="date" :placeholder="$t('order.xzrq')" v-model="orderdate" value-format="yyyy-MM-dd">
 						</el-date-picker>
 					</el-form-item>
-				</el-col>
-				<el-col :span="4">
-					<el-button type="primary" @click="getData">{{$t('message.search')}}</el-button>
-				</el-col>
-
+					<el-form-item>
+						<el-button type="primary" @click="getData" size="mini">{{$t('message.search')}}</el-button>
+					</el-form-item>
 			</el-form>
 		</div>
 		<el-table :data="order_entrusted_lists" style="width: 100%" v-show="value==0">
@@ -62,7 +55,7 @@
 			</el-table-column>
 			<el-table-column :label="$t('ar.cz')" v-show="canUndo" fixed="right">
 				<template slot-scope="scope">
-					<el-button @click="undoClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&(nowDate==orderDate||orderDate=='')">{{$t('l.chedan')}}</el-button>
+					<el-button @click="undoClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&(nowDate==orderDate||orderDate=='')&&circular_brake!=1">{{$t('l.chedan')}}</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -104,7 +97,7 @@
 			</el-table-column>
 			<el-table-column :label="$t('ar.cz')" fixed="right">
 				<template slot-scope="scope">
-					<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&(nowDate==orderDate||orderDate=='')">{{$t('ar.pc')}}</el-button>
+					<el-button @click="closeClick(scope.row)" type="text" size="small" v-if="scope.row.order_status==1&&(nowDate==orderDate||orderDate=='')&&circular_brake!=1">{{$t('ar.pc')}}</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -150,9 +143,12 @@
 				</template>
 			</el-table-column>
 		</el-table>
+		<div class="page">
+			<el-pagination  @current-change="changePage" :current-page="page" :page-size="20" :page-count="total" layout="prev, pager, next">
+		    </el-pagination>
+		</div>
 		<!--<span>共{{total}}页</span>-->
-		<el-pagination v-if="page>1" @current-change="changePage" :current-page.sync="page" :page-count='total' layout="total,prev, pager, next">
-		</el-pagination>
+		
 	</div>
 </template>
 
@@ -216,6 +212,7 @@
 				ordernum: '',
 				orderdate:'',
 				orderDate: '',
+				circular_brake:'',
 				nowDate: '',
 				order_entrusted_lists: [],
 				order_hold_lists: [],
@@ -255,7 +252,7 @@
 				}).then(res => {
 					this.total = res.data.data.page&&res.data.data.page.total;
 					this.options[this.value].item.call(this, res.data.data.list);
-
+                    this.circular_brake= res.data.data.circular_brake;
 				})
 			},
 			//平仓操作
@@ -306,11 +303,8 @@
 	.order {
 		padding: 20px;
 		min-height: 600px;
-		.datePicker {
-			height: 32px;
-			.el-input__inner {
-				height: 32px;
-			}
+		.page{
+			text-align: center;
 		}
 	}
 </style>

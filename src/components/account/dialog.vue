@@ -42,11 +42,11 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="商品报价点差" prop="order_diff">
-              <el-input v-model="form.order_diff"></el-input>
+              <el-input v-model="form.order_diff" :readonly="readonly"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="最大会员数" prop="max_member">
+            <el-form-item label="最大会员数" prop="max_member" v-if="viewLevel<6">
               <el-input v-model="form.max_member_number"></el-input>
             </el-form-item>
           </el-col>
@@ -61,15 +61,16 @@
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="信用额度" prop="credit">
+            <el-form-item label="信用额度" prop="credit" v-if="form.account_type==0" key='account_type'>
               <el-input v-model="form.credit" name="limit" :disabled="form.account_type==1"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item :label="title+'及下级占成总数'" prop="share_sum" label-width="60%;">
+            <!-- :label="level==6?:title+'占成':title+'及下级占成总数'" -->
+            <el-form-item :label="viewLevel==6?title+'占成' :title+'及下级占成总数'" prop="share_sum" label-width="60%;">
               <!-- <el-input name="total" v-model="form.share_sum"></el-input> -->
               <el-select v-model="form.share_sum">
-                <el-option v-if="item.value<=form.share_sum" v-for="item in share_sum" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                <el-option v-if="item.value<=formLimit.max_share_sum" v-for="item in share_sum" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -79,7 +80,7 @@
             </el-form-item>
           </el-col> -->
         </el-row>
-        <el-row v-if="viewLevel==5&&!form.account_type">
+        <el-row v-if="viewLevel==5&&form.account_type">
           <el-col :span="6">
             <el-form-item label="验证码" prop='code'>
               <el-input></el-input>
@@ -169,7 +170,7 @@
               <el-table-column align="center" label="显示权限">
                 <template slot-scope="scope">
                   <!-- :disabled="Boolean(form.creditLimit.showLimit)" -->
-                  <el-select size="mini" v-model="form.showLimit">
+                  <el-select size="mini" v-model="form.show_flag">
                     <el-option v-for="item in limits" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select>
@@ -265,7 +266,7 @@
         </el-row>
       </el-form>
     </el-dialog>
-    <el-dialog title="选择上级代理商" :visible.sync="proxyOn" :before-close="()=>{$emit('proxyClose',true);parent_id=''}">
+    <el-dialog title="选择上级代理商" :visible.sync="proxyOn" :before-close="()=>{$emit('proxyClose',true);parent_id='';$emit('update:preList',[])}">
       <el-row type="flex" justify="space-around">
         <el-col>
           <el-select v-model="parent_id" size="mini">
@@ -329,34 +330,34 @@ export default {
   name: "AccountDialog",
   data() {
     const empty = {
-      formError: null,
-      account: null,
-      name: null,
+      formError: "",
+      account: "",
+      name: "",
       password: "",
       repassword: "",
       account_type: 0,
-      credit: null,
-      open_service_fee_percentage: null,
-      close_service_fee_percentage: null,
-      order_diff: null,
-      close_order_buy: null,
-      close_order_sale: null,
-      close_order_undo: null,
-      share_sum: null,
-      close_service_fee_percentage: null,
-      deposit_frozen_percentage: null,
-      deposit_used_percentage: null,
-      max_buy_limit: null,
-      max_net_limit: null,
-      max_sale_limit: null,
-      open_order_buy: null,
-      open_order_sale: null,
-      open_order_undo: null,
-      open_service_fee_percentage: null,
-      order_diff: null,
-      single_max_transaction: null,
-      single_min_transaction: null,
-      max_member_number: null,
+      credit: "",
+      open_service_fee_percentage: "",
+      close_service_fee_percentage: "",
+      order_diff: "",
+      close_order_buy: "",
+      close_order_sale: "",
+      close_order_undo: "",
+      share_sum: "",
+      close_service_fee_percentage: "",
+      deposit_frozen_percentage: "",
+      deposit_used_percentage: "",
+      max_buy_limit: "",
+      max_net_limit: "",
+      max_sale_limit: "",
+      open_order_buy: "",
+      open_order_sale: "",
+      open_order_undo: "",
+      open_service_fee_percentage: "",
+      order_diff: "",
+      single_max_transaction: "",
+      single_min_transaction: "",
+      max_member_number: "",
       order_diff_dicount_percentage: 0,
       showLimit: 1
     };
@@ -394,11 +395,11 @@ export default {
       limits: [
         {
           value: 1,
-          label: "是"
+          label: "有"
         },
         {
           value: 0,
-          label: "否"
+          label: "无"
         }
       ],
       changeType: [
@@ -444,7 +445,7 @@ export default {
             validator: (rule, value, callback) => {
               if (this.form.password != this.form.repassword) {
                 this.formMsg("err_pwd_diff");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -469,7 +470,7 @@ export default {
                 )
               ) {
                 this.formMsg("err_open_fee");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -488,7 +489,7 @@ export default {
                 )
               ) {
                 this.formMsg("err_close_fee");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -504,7 +505,7 @@ export default {
                 Number(this.formLimit.min_order_diff)
               ) {
                 this.formMsg("err_order_diff");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -523,7 +524,7 @@ export default {
                 )
               ) {
                 this.formMsg("err_credit");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -543,7 +544,7 @@ export default {
                 )
               ) {
                 this.formMsg("err_share_sum");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -562,7 +563,12 @@ export default {
                 )
               ) {
                 this.formMsg("err_min_transaction");
-                callback();
+              }
+              if (
+                this.form.single_min_transaction >
+                this.form.single_max_transaction
+              ) {
+                this.formMsg("err_min_max");
               } else {
                 callback();
               }
@@ -581,7 +587,12 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_transaction");
-                callback();
+              }
+              if (
+                this.form.single_min_transaction >
+                this.form.single_max_transaction
+              ) {
+                this.formMsg("err_min_max");
               } else {
                 callback();
               }
@@ -592,7 +603,6 @@ export default {
         max_buy: [
           {
             validator: (rule, value, callback) => {
-              // console.log(this.form.single_min_transaction);
               if (
                 !this.inRange(
                   this.form.max_buy_limit,
@@ -601,7 +611,6 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_buy");
-                callback();
               } else {
                 callback();
               }
@@ -620,7 +629,7 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_sale");
-                callback();
+                // callback();
               } else {
                 callback();
               }
@@ -639,7 +648,6 @@ export default {
                 )
               ) {
                 this.formMsg("err_max_net");
-                callback();
               } else {
                 callback();
               }
@@ -649,71 +657,71 @@ export default {
         ]
       },
       form: {
-        formError: null,
-        account: null,
-        name: null,
+        formError: "",
+        account: "",
+        name: "",
         password: "",
         repassword: "",
         account_type: 0,
-        credit: null,
-        open_service_fee_percentage: null,
-        close_service_fee_percentage: null,
-        order_diff: null,
-        close_order_buy: null,
-        close_order_sale: null,
-        close_order_undo: null,
-        share_sum: null,
-        close_service_fee_percentage: null,
-        deposit_frozen_percentage: null,
-        deposit_used_percentage: null,
-        max_buy_limit: null,
-        max_net_limit: null,
-        max_sale_limit: null,
-        open_order_buy: null,
-        open_order_sale: null,
-        open_order_undo: null,
-        open_service_fee_percentage: null,
-        order_diff: null,
-        single_max_transaction: null,
-        single_min_transaction: null,
-        max_member_number: null,
+        credit: "",
+        open_service_fee_percentage: "",
+        close_service_fee_percentage: "",
+        order_diff: "",
+        close_order_buy: "",
+        close_order_sale: "",
+        close_order_undo: "",
+        share_sum: "",
+        close_service_fee_percentage: "",
+        deposit_frozen_percentage: "",
+        deposit_used_percentage: "",
+        max_buy_limit: "",
+        max_net_limit: "",
+        max_sale_limit: "",
+        open_order_buy: "",
+        open_order_sale: "",
+        open_order_undo: "",
+        open_service_fee_percentage: "",
+        order_diff: "",
+        single_max_transaction: "",
+        single_min_transaction: "",
+        max_member_number: "",
         order_diff_dicount_percentage: 0,
-        showLimit: 1
+        show_flag: 1
       },
       cashForm: {},
       creditForm: {},
       formLimit: {
-        close_order_buy: null,
-        close_order_sale: null,
-        close_order_undo: null,
-        max_close_service_fee_percentage: null,
-        max_credit: null,
-        max_deposit_frozen_percentage: null,
-        max_deposit_used_percentage: null,
-        max_max_buy_limit: null,
-        max_max_net_limit: null,
-        max_max_sale_limit: null,
-        max_open_service_fee_percentage: null,
-        max_share_sum: null,
-        max_single_max_transaction: null,
-        max_single_min_transaction: null,
-        max_win_loss_limit: null,
-        min_close_service_fee_percentage: null,
-        min_credit: null,
-        min_deposit_frozen_percentage: null,
-        min_deposit_used_percentage: null,
-        min_max_buy_limit: null,
-        min_max_net_limit: null,
-        min_max_sale_limit: null,
-        min_open_service_fee_percentage: null,
-        min_order_diff: null,
-        min_share_sum: null,
-        min_single_max_transaction: null,
-        min_single_min_transaction: null,
-        min_win_loss_limit: null,
-        open_order_buy: null,
-        open_order_sale: null,
-        open_order_undo: null
+        close_order_buy: "",
+        close_order_sale: "",
+        close_order_undo: "",
+        max_close_service_fee_percentage: "",
+        max_credit: "",
+        max_deposit_frozen_percentage: "",
+        max_deposit_used_percentage: "",
+        max_max_buy_limit: "",
+        max_max_net_limit: "",
+        max_max_sale_limit: "",
+        max_open_service_fee_percentage: "",
+        max_share_sum: "",
+        max_single_max_transaction: "",
+        max_single_min_transaction: "",
+        max_win_loss_limit: "",
+        min_close_service_fee_percentage: "",
+        min_credit: "",
+        min_deposit_frozen_percentage: "",
+        min_deposit_used_percentage: "",
+        min_max_buy_limit: "",
+        min_max_net_limit: "",
+        min_max_sale_limit: "",
+        min_open_service_fee_percentage: "",
+        min_order_diff: "",
+        min_share_sum: "",
+        min_single_max_transaction: "",
+        min_single_min_transaction: "",
+        min_win_loss_limit: "",
+        open_order_buy: "",
+        open_order_sale: "",
+        open_order_undo: ""
       },
       cashLimit: {},
       creditLimit: {}
@@ -753,6 +761,10 @@ export default {
     visible: {
       type: Boolean,
       default: false
+    },
+    readonly: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -792,8 +804,12 @@ export default {
     },
     handleClose(done) {
       this.$emit("dialogClose");
-      // Object.assign(this.form, empty);
       this.$refs.form.resetFields(); // 此方法清空表单失败了 fuck
+      Object.assign(this.form, this.empty); // 玄学bug
+      // this.user_id = "";
+      this.form.user_id = ""; // 玄学bug
+      this.parent_id = "";
+      this.$emit("update:preList", []);
     },
     comeinClose(done) {
       this.comeinSwitch = false;
@@ -867,7 +883,7 @@ export default {
           Object.assign(this.form, this.creditForm); //默认使用信用模式
           Object.assign(this.formLimit, this.creditLimit); //信用模式限制条件
           this.form.credit = this.formLimit.max_credit;
-          // this.form.share_sum = this.formLimit.max_share_sum;
+          this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
     },
@@ -877,7 +893,7 @@ export default {
           let data = res.data.data;
           Object.assign(this.form, data.user);
           Object.assign(this.formLimit, data.user_limit);
-          this.form.credit = this.formLimit.max_credit;
+          // this.form.credit = this.formLimit.max_credit;
           // this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
@@ -888,7 +904,7 @@ export default {
           let data = res.data.data;
           Object.assign(this.form, data.user);
           Object.assign(this.formLimit, data.user_limit);
-          this.form.credit = this.formLimit.max_credit;
+          // this.form.credit = this.formLimit.max_credit;
           // this.form.share_sum = this.formLimit.max_share_sum;
         }
       });
@@ -909,7 +925,9 @@ export default {
       }
     },
     msg(e) {
+      // console.log(this.form);
       if (e.data.status == 1) {
+        this.$refs.form.resetFields();
         Message({
           center: true,
           message: this.$t("message.saveSuccess"),

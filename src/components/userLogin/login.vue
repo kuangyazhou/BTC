@@ -15,7 +15,7 @@
               <span class="flex">
                 <el-checkbox v-model="checked">{{$t('message.remember')}}</el-checkbox>
               </span>
-              <span class="flex login-err text-blue">{{$t('message.unLogin')}}?</span>
+       
             </div>
           </el-form-item>
           <el-form-item>

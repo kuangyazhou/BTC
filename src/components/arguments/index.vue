@@ -143,7 +143,7 @@
 								{{ scope.row.single_open_percentage + "%" }}
 							</template>
 						</el-table-column>
-						<el-table-column prop="duration" :label="$t('ar.sxf')" align="center" width="120px">
+						<el-table-column prop="duration" :label="$t('ar.shangxian')" align="center" width="120px">
 							<template slot-scope="scope">
 								{{ scope.row.single_open_limit_percentage + "%" }}
 							</template>
@@ -155,7 +155,7 @@
 								{{ scope.row.single_close_percentage + "%" }}
 							</template>
 						</el-table-column>
-						<el-table-column prop="duration" :label="$t('ar.sxf')" align="center" width="120px">
+						<el-table-column prop="duration" :label="$t('ar.shangxian')" align="center" width="120px">
 							<template slot-scope="scope">
 								{{ scope.row.single_close_limit_percentage + "%" }}
 							</template>
@@ -1050,7 +1050,7 @@ export default {
           }
           break;
         case "night":
-          debugger;
+          // debugger;
           url = "/index.php?r=btc/config/review-save";
           if (
             this.dialogData.small_limit.isNum() === false ||

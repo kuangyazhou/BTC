@@ -6,7 +6,7 @@ export default {
 					method: 'post',
 					url: '/index.php?r=btc/member-pay/pay-first'
 				}).then(res=>{
-					if(res.data){
+					if(res&&res.data){
 					    resolve(res.data)
 					}
 				

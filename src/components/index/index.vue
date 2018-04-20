@@ -1,17 +1,18 @@
 <template>
 	<div class="index">
+		<Notice ref="notice"></Notice>
 		<header>
-			<img src="./img/logo.png" class="logo" @click.stop="$router.push({'path':'/welcome'})" />
+			<img src="./img/logo.png" class="logo" @click.stop="$router.push({'path':'/'})" />
 			<span class="title">
 				{{$t('l.aqkkdjypt')}}
 			</span>
 			<span class="tab">
 				<el-button type="primary" class="user-button" @click.stop="$router.push({'path':'/userlogin'})" v-if="!loginStatus">登录/LOGIN</el-button>
 				<el-button type="primary" class="user-button" @click.stop="logout" v-if="loginStatus">退出/LOGOUT</el-button>
-				<el-button type="primary" class="user-button" @click="$router.push({'path':'/userCenter'})" v-if="loginStatus">{{$t('l.cz')}}</el-button>
-				<el-button type="primary" class="user-button" @click="$router.push({'path':'/withDraw'})" v-if="loginStatus">{{$t('l.tx')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/userCenter'})" v-if="loginStatus&&loginStatus.account_type">{{$t('l.cz')}}</el-button>
+				<el-button type="primary" class="user-button" @click="$router.push({'path':'/withDraw'})" v-if="loginStatus&&loginStatus.account_type">{{$t('l.tx')}}</el-button>
 				<el-button type="primary" class="user-button" @click="$router.push({'path':'/order'})" v-if="loginStatus">{{$t('l.dd')}}</el-button>
-					<el-button type="primary" class="user-button" @click="$router.push({'path':'/'})" >{{$t('l.jy')}}</el-button>
+					<el-button type="primary" class="user-button" @click="$router.push({'path':'/trade'})" >{{$t('l.jy')}}</el-button>
 				<el-dropdown @command="changeLn">
 				  <el-button type="primary" class="lang-button" round medium >
 				    {{language}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -90,44 +91,78 @@
 <script>
 	import Vue from "vue";
 	import { getUserInfo } from "@/utils/apiUtils";
+	import Notice from "@/components/common/dialog-notice";
 	import {
 		Button,
 		Dropdown,
+		Message,
 		DropdownMenu,
 		DropdownItem
 	} from "element-ui";
 	Vue.use(Button);
-
 	Vue.use(Dropdown);
 	Vue.use(DropdownMenu);
 	Vue.use(DropdownItem);
 
 	export default {
-		watch:{
-			loginStatus:function(val){
-				if(!val){
-					this.$router.push({'path':'/'})
-				}
+		components: {
+			Notice
+		},
+		watch: {
+			loginStatus: function(val) {
+					if(val&&this.$store.state.user.token) {					
+						setTimeout(() => {
+							this.$refs.notice.dialogVisible = true;
+						}, 1000)
+					}
+				
+
+			},
+			changeUrl: function(val) {
+			
+				this.setSend = true;
 			}
 		},
 		computed: {
 			loginStatus: function() {
 				return this.$store.state.user.userInfo || getUserInfo()
+			},
+			socketUrl: function() {
+				
+				return this.$store.state.user.socketUrl;
+			},
+			changeUrl:function(){
+				return this.$store.state.user.changeUrl;
 			}
 		},
-		mounted() {
-			this.lg = localStorage.getItem("lang");
+		created(){
+			this.lg = localStorage.getItem("lang")||'cn';
 			this.language = this.lag[this.lg];
 			this.$i18n.locale = this.lg; //设置语言
-			var marketSocketUrl = "ws://192.168.123.136:8888/kline"; //websocket地址
-		    this.marketSocket = new WebSocket(marketSocketUrl);
-		    this.setWebSocket();
+			localStorage.setItem("lang",this.lg);
+
+		},
+		mounted() {	
+			
+			if(this.socketUrl){
+				this.marketSocket = new WebSocket(this.marketSocketUrl);
+			}
+			
+			this.setWebSocket();
+	
+
 		},
 		data() {
+			let url  ='ws://'+ `${window.location.hostname}:8888/ws`
+			//let url = 'ws://192.168.123.10:8888/ws'
 			return {
 				reConnect: true,
-				dayPrice:[0,0,0,0,0],
+				setSend:true,
+				dayPrice: [
+					[0, 0, 0, 0, 0]
+				],
 				language: '简体中文',
+				marketSocketUrl:url ,
 				lag: {
 					'cn': '简体中文',
 					'en': 'English'
@@ -137,11 +172,11 @@
 		},
 		methods: {
 			setWebSocket() {
-				var that = this;
+				let that = this;
 				that.marketSocket.onopen = function(evt) {
-					var sendData = '{"Flag":3,"Sub":"btc/minute1","Msg":"","Status":0}';
+					//					var sendData = '{"Path":"price","Flag":3,"Sub":"btc/minute1","Msg":"","Status":0}';
 
-					that.marketSocket.send(sendData);
+					that.marketSocket.send(that.socketUrl);
 				};
 				that.marketSocket.onerror = function() {};
 				that.marketSocket.onclose = function() {
@@ -152,33 +187,53 @@
 					}
 
 					setTimeout(function() {
-						var marketSocketUrl = "ws://192.168.123.136:8888/kline "; //websocket地址
-						that.marketSocket = new WebSocket(marketSocketUrl);
+
+						that.marketSocket = new WebSocket(that.marketSocketUrl);
 						that.setWebSocket();
 						console.log("连接重连...");
 					}, 1000);
 				};
 				that.marketSocket.onmessage = function(evt) {
-					var data = JSON.parse(evt.data);
-					//回复心跳
-					if(data.Flag == 1) {
-						const heartbeat = JSON.parse(evt.data).Msg;
+					let data = JSON.parse(evt.data);
+					
+					if(that.setSend){
+						that.marketSocket.send(that.socketUrl);
+						that.setSend = false;
+				
+					}
+					
+					if(!data) return;
 
+					let msg = {
+						kLine: ''
+					};
+					if(data.Msg.indexOf('{') >= 0) {
+						msg = JSON.parse(data.Msg);
+						that.$store.commit('setMsg', msg)
+					}
+					//回复心跳
+					if(data.Path == "ping") {
+						const heartbeat = JSON.parse(evt.data).Msg;
 						that.marketSocket.send(
-							'{"Flag":2,"Msg":"' + heartbeat + '","Status":0}'
+							'{"Path":"pong","Flag":2,"Msg":"' + heartbeat + '","Status":0}'
 						);
 						return;
 					}
-
-					that.dayPrice = data.dayPrice ? data.dayPrice : that.dayPrice;
-					that.$store.commit('getPrice',that.dayPrice);
+					if(msg.dayPrice)
+						that.dayPrice = msg.dayPrice ? msg.dayPrice : that.dayPrice;
+					if(that.dayPrice) {
+						that.$store.commit('getPrice', that.dayPrice);
+					}
+					
 
 				};
 			},
 			logout() {
 				this.$store.dispatch("userlogout");
-				
-				
+				if(this.$route.name!='Trade'){
+				        window.location.replace('/');		
+				  }
+
 			},
 			changeLn(command) {
 				this.language = this.lag[command];
@@ -187,7 +242,7 @@
 			}
 		},
 		beforeDestroy() {
-			this.marketSocket.send('{"Flag":5,"Msg":"","Status":0}');
+			this.marketSocket.send('{"Path":"close","Flag":5,"Msg":"","Status":0}');
 			this.reConnect = false;
 			this.marketSocket.close();
 		}

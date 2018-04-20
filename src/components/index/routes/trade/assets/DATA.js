@@ -39,7 +39,6 @@ export default {
 				})
 			})
 		},
-		///index.php?r=btc/order/close-deal-hold-orde
 		//持仓单平仓
 		dealHoldOrder(data){
 			return new Promise((resolve,reject)=>{
@@ -50,6 +49,20 @@ export default {
 				}).then(res=>{
 					if(res.data){
 					    resolve(res.data)
+					}
+				})
+			})
+		},
+		//获取公告信息
+		getNotice(){
+			return new Promise((resolve,reject)=>{
+				request({
+					method: 'get',
+					url: '/index.php?r=btc/member/notice-index'
+				}).then(res=>{
+					if(res.data){
+					    resolve(res.data)
+				
 					}
 				})
 			})
