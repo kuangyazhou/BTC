@@ -6,14 +6,13 @@
 
 <script>
 export default {
-  data() {
-    return {
-      msg: "This is the Footer"
-    };
-  }
+    data() {
+        return {
+            msg: "This is the Footer"
+        };
+    }
 };
 </script>
 
 <style scoped>
-
 </style>
